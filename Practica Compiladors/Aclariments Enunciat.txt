@@ -1,0 +1,3 @@
+
+
+- Les expressions numèriques de la pràctica no seran parentitzades. Només ho podran ser les booleanes.
