@@ -22,7 +22,7 @@
 #define FULL 12
 #define EMPTY 13
 #define WHILE 14
-#define EWHILE 15
+#define ENDWHILE 15
 #define ASSIG 16
 #define PLUS 17
 #define TIMES 18
@@ -34,7 +34,6 @@
 #define NUM 24
 #define ID 25
 #define SPACE 26
-#define ENDWHILE 30
 
 #ifdef __USE_PROTOS
 void plumber(AST**_root);

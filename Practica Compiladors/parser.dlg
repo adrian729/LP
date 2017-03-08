@@ -127,7 +127,7 @@ WHILE
 
 ENDWHILE
 	<<
-		NLA = EWHILE;
+		NLA = ENDWHILE;
 	>>
 
 =
@@ -180,7 +180,7 @@ TRUE | FALSE
 		NLA = ID;
 	>>
 
-[\ \n]
+[\ \t\n]
 	<<
 		NLA = SPACE;
     zzskip();  

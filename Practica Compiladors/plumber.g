@@ -27,8 +27,62 @@ AST* createASTnode(Attrib* attr, int ttype, char *textt);
 #include <cmath>
 // function to fill token information
 void zzcr_attr(Attrib *attr, int type, char *text) {
-    attr->kind = text;
-    attr->text = "";
+
+  switch(type) {
+    case ID:
+      attr->kind = "id";
+      attr->text = text;
+      break;
+    case NUM:   
+    case PLUS:
+    case TIMES:    
+    case LEN:
+    case DIAM:
+      attr->kind = "number";
+      attr->text = text;
+      break;
+    case BOOL:
+    case COMP:
+    case EMPTY:
+    case FULL:
+    case NOT:
+    case AND:
+    case OR:
+      attr->kind = "boolean";
+      attr->text = text;
+      break;
+    case TUBE:
+    case MERGE:
+      attr->kind = "tube";
+      attr->text = text;
+      break;
+    case SPLIT:
+      attr->kind = "split";
+      attr->text = text;
+      break;
+    case CON:
+      attr->kind = "connector";
+      attr->text = text;
+      break;
+    case TVEC:
+      attr->kind = "tubeVector";
+      attr->text = text;
+      break;
+    case WHILE:
+    case PUSH:
+    case POP:
+      attr->kind = "instruction";
+      attr->text = text;
+      break;
+    case ASSIG:
+      attr->kind = "assignation";
+      attr->text = text;
+      break;
+    default:
+      attr->kind = text;
+      attr->text = "";
+  }
+
 }
 
 // function to create a new AST node
@@ -81,6 +135,33 @@ void ASTPrintIndent(AST *a,string s)
   }
 }
 
+//Modified ASTPrintIndent to use diferent kind types and produce the same tree.
+void ASTPrintIndentNEW(AST *a,string s)
+{
+
+  if (a==NULL) return;
+
+  if (a->text != "") cout << a->text;
+  else cout << a->kind;
+  cout << endl;
+
+  AST *i = a->down;
+  while (i!=NULL && i->right!=NULL) {
+    cout<<s+"  \\__";
+    if(i->text.size() > 0) ASTPrintIndentNEW(i,s+"  |"+string(i->text.size(),' '));
+    else ASTPrintIndentNEW(i,s+"  |"+string(i->kind.size(),' '));
+
+    i=i->right;
+  }
+  
+  if (i!=NULL) {
+      cout<<s+"  \\__";
+      if(i->text.size() > 0) ASTPrintIndentNEW(i,s+"   "+string(i->text.size(),' '));
+      else ASTPrintIndentNEW(i,s+"   "+string(i->kind.size(),' '));
+      i=i->right;
+  }
+}
+
 /// print AST 
 void ASTPrint(AST *a)
 {
@@ -91,10 +172,29 @@ void ASTPrint(AST *a)
   }
 }
 
+//Modified ASTPrint to use diferent kind types and produce the same tree.
+void ASTPrintNEW(AST *a)
+{
+  while (a!=NULL) {
+    cout<<" ";
+    ASTPrintIndentNEW(a,"");
+    a=a->right;
+  }
+}
+
+void executePlumber(AST *a) {
+
+}
+
 int main() {
   AST *root = NULL;
   ANTLR(plumber(&root), stdin);
+  /**CHI:
   ASTPrint(root);
+  cout << endl;
+  ENDCHI*/
+  ASTPrintNEW(root);
+  executePlumber(root);
 }
 >>
 
@@ -102,24 +202,24 @@ int main() {
 #lexclass START
 
 // Keywords
-#token TUBE "TUBE"
-#token CON "CONNECTOR"
+#token TUBE "TUBE"            //OK
+#token CON "CONNECTOR"        //OK
 
-#token SPLIT "SPLIT"
-#token MERGE "MERGE"
-#token LEN "LENGTH"
-#token DIAM "DIAMETER"
+#token SPLIT "SPLIT"          //OK
+#token MERGE "MERGE"          //OK
+#token LEN "LENGTH"           //OK
+#token DIAM "DIAMETER"        //OK
 
-#token TVEC "TUBEVECTOR"
+#token TVEC "TUBEVECTOR"      //OK
 #token OF "OF"
 
-#token PUSH "PUSH"
-#token POP "POP"
-#token FULL "FULL"
-#token EMPTY "EMPTY"
+#token PUSH "PUSH"            //OK
+#token POP "POP"              //OK
+#token FULL "FULL"            //OK
+#token EMPTY "EMPTY"          //OK
 
-#token WHILE "WHILE"
-#token EWHILE "ENDWHILE"
+#token WHILE "WHILE"          //OK
+#token ENDWHILE "ENDWHILE"
 
 
 // Operations
@@ -143,7 +243,7 @@ int main() {
 #token ID "[A-Za-z$\_][A-Za-z0-9$\_]*"
 
 //WhiteSpace
-#token SPACE "[\ \n]" << zzskip();>>
+#token SPACE "[\ \t\n]" << zzskip();>>
 
 
 /** SYNTAX */
