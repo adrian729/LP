@@ -25,6 +25,37 @@ AST* createASTnode(Attrib* attr, int ttype, char *textt);
 <<
 #include <cstdlib>
 #include <cmath>
+#include <map>
+#include <vector>
+
+
+/**DATA STRUCTURES*/
+
+//Tube
+typedef struct {
+  int length, diameter; // tube length and diameter.
+} Tube;
+
+//Connector
+typedef struct {
+  int diameter; // tube length and diameter.
+} Connector;
+
+//TubeVector
+typedef struct {
+  vector<Tube> tubes; // vector of tubes.
+  int size, top; // vector size and next item index.
+} TubeVector;
+
+
+map<string, string> stock; // ID, typeOfObject
+map<string, Tube> tubeStock; // ID, Tube
+map<string, Connector> connectorStock; // ID, Connector
+map<string, TubeVector> tubeVectorStock; // ID, TubeVector
+
+
+/**METHODS*/
+
 // function to fill token information
 void zzcr_attr(Attrib *attr, int type, char *text) {
 
@@ -182,14 +213,44 @@ void ASTPrintNEW(AST *a)
   }
 }
 
-void executePlumber(AST *a) {
+Tube tubeDec(AST *a){  
+  Tube t;
+  if(a->kind == "id"){
+    map<string,string>::iterator stockIt = stock.find(a->text);
+    if(stockIt != stock.end()){
+      t = tubeStock.find(a->text)->second;
+    }
+  }
+  return t;
+}
 
+int evalNumberInst(AST *a){
+  if(a->text == "LENGTH") {
+    return tubeDec(child(a, 0)).length;
+  }
+  else if(a->text == "DIAMETER") {
+
+  }
+  return -1;
+}
+
+void executePlumber(AST *a) {
+  int inst = 0;
+  while(child(a, inst)) {
+    /*CHI:*/
+    cout << child(a, inst)->kind << " " << child(a, inst)->text << endl;
+    /*ENDCHI*/
+    if(child(a, inst)->kind == "number") {
+      cout << evalNumberInst(child(a, inst)) << endl;
+    }
+    ++inst;
+  }
 }
 
 int main() {
   AST *root = NULL;
   ANTLR(plumber(&root), stdin);
-  /**CHI:
+  /*CHI:
   ASTPrint(root);
   cout << endl;
   ENDCHI*/

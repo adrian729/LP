@@ -1,0 +1,1 @@
+afegir try-catch i throw exception per captar els errors i llençar el missatge adient (i evitar que peti tot, que no ho ha de fer)
