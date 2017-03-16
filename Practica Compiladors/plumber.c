@@ -96,31 +96,27 @@ void zzcr_attr(Attrib *attr, int type, char *text) {
     attr->kind = "id";
     attr->text = text;
     break;
-    case NUM:   
+    case NUM:
     case PLUS:
-    case TIMES:    
+    case TIMES:
     case LEN:
     case DIAM:
     attr->kind = "number";
     attr->text = text;
     break;
     case BOOL:
-    case COMP:
-    case EMPTY:
-    case FULL:
     case NOT:
     case AND:
     case OR:
+    case COMP:
+    case EMPTY:
+    case FULL:
     attr->kind = "boolean";
     attr->text = text;
     break;
     case TUBE:
     case MERGE:
     attr->kind = "tube";
-    attr->text = text;
-    break;
-    case SPLIT:
-    attr->kind = "split";
     attr->text = text;
     break;
     case CON:
@@ -131,14 +127,18 @@ void zzcr_attr(Attrib *attr, int type, char *text) {
     attr->kind = "tubeVector";
     attr->text = text;
     break;
-    case WHILE:
-    case PUSH:
-    case POP:
-    attr->kind = "instruction";
+    case SPLIT:
+    attr->kind = "split";
     attr->text = text;
     break;
     case ASSIG:
     attr->kind = "assignation";
+    attr->text = text;
+    break;
+    case WHILE:
+    case PUSH:
+    case POP:
+    attr->kind = "instruction";
     attr->text = text;
     break;
     default:
@@ -413,7 +413,7 @@ AST **_root;
         zzmatch(ID); zzsubchild(_root, &_sibling, &_tail); zzCONSUME;
       }
       else {
-        if ( (setwd1[LA(1)]&0x40) ) {
+        if ( (LA(1)==TUBE) ) {
           tubeDec(zzSTR); zzlink(_root, &_sibling, &_tail);
         }
         else {
@@ -424,7 +424,12 @@ AST **_root;
             if ( (LA(1)==TVEC) ) {
               tvecDec(zzSTR); zzlink(_root, &_sibling, &_tail);
             }
-            else {zzFAIL(1,zzerr2,&zzMissSet,&zzMissText,&zzBadTok,&zzBadText,&zzErrk); goto fail;}
+            else {
+              if ( (LA(1)==MERGE) ) {
+                mergeExpr(zzSTR); zzlink(_root, &_sibling, &_tail);
+              }
+              else {zzFAIL(1,zzerr2,&zzMissSet,&zzMissText,&zzBadTok,&zzBadText,&zzErrk); goto fail;}
+            }
           }
         }
       }
@@ -449,15 +454,15 @@ AST **_root;
 fail:
   zzEXIT(zztasp1);
   zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
-  zzresynch(setwd1, 0x80);
+  zzresynch(setwd1, 0x40);
   }
 }
 
 void
 #ifdef __USE_PROTOS
-splitTube(AST**_root)
+length(AST**_root)
 #else
-splitTube(_root)
+length(_root)
 AST **_root;
 #endif
 {
@@ -465,29 +470,41 @@ AST **_root;
   zzBLOCK(zztasp1);
   zzMake0;
   {
-  zzmatch(SPLIT); zzsubroot(_root, &_sibling, &_tail); zzCONSUME;
-  {
-    zzBLOCK(zztasp2);
-    zzMake0;
-    {
-    if ( (LA(1)==ID) ) {
-      zzmatch(ID); zzsubchild(_root, &_sibling, &_tail); zzCONSUME;
-    }
-    else {
-      if ( (setwd2[LA(1)]&0x1) ) {
-        tubeDec(zzSTR); zzlink(_root, &_sibling, &_tail);
-      }
-      else {zzFAIL(1,zzerr4,&zzMissSet,&zzMissText,&zzBadTok,&zzBadText,&zzErrk); goto fail;}
-    }
-    zzEXIT(zztasp2);
-    }
-  }
+  zzmatch(LEN); zzsubroot(_root, &_sibling, &_tail); zzCONSUME;
+  zzmatch(27);  zzCONSUME;
+  zzmatch(ID); zzsubchild(_root, &_sibling, &_tail); zzCONSUME;
+  zzmatch(29);  zzCONSUME;
   zzEXIT(zztasp1);
   return;
 fail:
   zzEXIT(zztasp1);
   zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
-  zzresynch(setwd2, 0x2);
+  zzresynch(setwd1, 0x80);
+  }
+}
+
+void
+#ifdef __USE_PROTOS
+diameter(AST**_root)
+#else
+diameter(_root)
+AST **_root;
+#endif
+{
+  zzRULE;
+  zzBLOCK(zztasp1);
+  zzMake0;
+  {
+  zzmatch(DIAM); zzsubroot(_root, &_sibling, &_tail); zzCONSUME;
+  zzmatch(27);  zzCONSUME;
+  zzmatch(ID); zzsubchild(_root, &_sibling, &_tail); zzCONSUME;
+  zzmatch(29);  zzCONSUME;
+  zzEXIT(zztasp1);
+  return;
+fail:
+  zzEXIT(zztasp1);
+  zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
+  zzresynch(setwd2, 0x1);
   }
 }
 
@@ -514,33 +531,7 @@ AST **_root;
 fail:
   zzEXIT(zztasp1);
   zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
-  zzresynch(setwd2, 0x4);
-  }
-}
-
-void
-#ifdef __USE_PROTOS
-intW(AST**_root)
-#else
-intW(_root)
-AST **_root;
-#endif
-{
-  zzRULE;
-  zzBLOCK(zztasp1);
-  zzMake0;
-  {
-  zzmatch(ID); zzsubchild(_root, &_sibling, &_tail); zzCONSUME;
-  zzmatch(ID); zzsubchild(_root, &_sibling, &_tail);
-  (*_root)=createASTlist(_sibling);
- zzCONSUME;
-
-  zzEXIT(zztasp1);
-  return;
-fail:
-  zzEXIT(zztasp1);
-  zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
-  zzresynch(setwd2, 0x8);
+  zzresynch(setwd2, 0x2);
   }
 }
 
@@ -559,22 +550,7 @@ AST **_root;
   if ( (LA(1)==PUSH) ) {
     zzmatch(PUSH); zzsubroot(_root, &_sibling, &_tail); zzCONSUME;
     zzmatch(ID); zzsubchild(_root, &_sibling, &_tail); zzCONSUME;
-    {
-      zzBLOCK(zztasp2);
-      zzMake0;
-      {
-      if ( (LA(1)==ID) ) {
-        zzmatch(ID); zzsubchild(_root, &_sibling, &_tail); zzCONSUME;
-      }
-      else {
-        if ( (setwd2[LA(1)]&0x10) ) {
-          tubeDec(zzSTR); zzlink(_root, &_sibling, &_tail);
-        }
-        else {zzFAIL(1,zzerr5,&zzMissSet,&zzMissText,&zzBadTok,&zzBadText,&zzErrk); goto fail;}
-      }
-      zzEXIT(zztasp2);
-      }
-    }
+    zzmatch(ID); zzsubchild(_root, &_sibling, &_tail); zzCONSUME;
   }
   else {
     if ( (LA(1)==POP) ) {
@@ -582,14 +558,163 @@ AST **_root;
       zzmatch(ID); zzsubchild(_root, &_sibling, &_tail); zzCONSUME;
       zzmatch(ID); zzsubchild(_root, &_sibling, &_tail); zzCONSUME;
     }
-    else {zzFAIL(1,zzerr6,&zzMissSet,&zzMissText,&zzBadTok,&zzBadText,&zzErrk); goto fail;}
+    else {zzFAIL(1,zzerr4,&zzMissSet,&zzMissText,&zzBadTok,&zzBadText,&zzErrk); goto fail;}
   }
   zzEXIT(zztasp1);
   return;
 fail:
   zzEXIT(zztasp1);
   zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
+  zzresynch(setwd2, 0x4);
+  }
+}
+
+void
+#ifdef __USE_PROTOS
+tubeDec(AST**_root)
+#else
+tubeDec(_root)
+AST **_root;
+#endif
+{
+  zzRULE;
+  zzBLOCK(zztasp1);
+  zzMake0;
+  {
+  zzmatch(TUBE); zzsubroot(_root, &_sibling, &_tail); zzCONSUME;
+  numExpr(zzSTR); zzlink(_root, &_sibling, &_tail);
+  numExpr(zzSTR); zzlink(_root, &_sibling, &_tail);
+  zzEXIT(zztasp1);
+  return;
+fail:
+  zzEXIT(zztasp1);
+  zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
+  zzresynch(setwd2, 0x8);
+  }
+}
+
+void
+#ifdef __USE_PROTOS
+connectorDec(AST**_root)
+#else
+connectorDec(_root)
+AST **_root;
+#endif
+{
+  zzRULE;
+  zzBLOCK(zztasp1);
+  zzMake0;
+  {
+  zzmatch(CON); zzsubroot(_root, &_sibling, &_tail); zzCONSUME;
+  numExpr(zzSTR); zzlink(_root, &_sibling, &_tail);
+  zzEXIT(zztasp1);
+  return;
+fail:
+  zzEXIT(zztasp1);
+  zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
+  zzresynch(setwd2, 0x10);
+  }
+}
+
+void
+#ifdef __USE_PROTOS
+tvecDec(AST**_root)
+#else
+tvecDec(_root)
+AST **_root;
+#endif
+{
+  zzRULE;
+  zzBLOCK(zztasp1);
+  zzMake0;
+  {
+  zzmatch(TVEC); zzsubroot(_root, &_sibling, &_tail); zzCONSUME;
+  zzmatch(OF);  zzCONSUME;
+  numExpr(zzSTR); zzlink(_root, &_sibling, &_tail);
+  zzEXIT(zztasp1);
+  return;
+fail:
+  zzEXIT(zztasp1);
+  zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
   zzresynch(setwd2, 0x20);
+  }
+}
+
+void
+#ifdef __USE_PROTOS
+mergeExpr(AST**_root)
+#else
+mergeExpr(_root)
+AST **_root;
+#endif
+{
+  zzRULE;
+  zzBLOCK(zztasp1);
+  zzMake0;
+  {
+  zzmatch(MERGE); zzsubroot(_root, &_sibling, &_tail); zzCONSUME;
+  {
+    zzBLOCK(zztasp2);
+    zzMake0;
+    {
+    if ( (LA(1)==ID) ) {
+      zzmatch(ID); zzsubchild(_root, &_sibling, &_tail); zzCONSUME;
+    }
+    else {
+      if ( (LA(1)==MERGE) ) {
+        mergeExpr(zzSTR); zzlink(_root, &_sibling, &_tail);
+      }
+      else {zzFAIL(1,zzerr5,&zzMissSet,&zzMissText,&zzBadTok,&zzBadText,&zzErrk); goto fail;}
+    }
+    zzEXIT(zztasp2);
+    }
+  }
+  zzmatch(ID); zzsubchild(_root, &_sibling, &_tail); zzCONSUME;
+  {
+    zzBLOCK(zztasp2);
+    zzMake0;
+    {
+    if ( (LA(1)==ID) ) {
+      zzmatch(ID); zzsubchild(_root, &_sibling, &_tail); zzCONSUME;
+    }
+    else {
+      if ( (LA(1)==MERGE) ) {
+        mergeExpr(zzSTR); zzlink(_root, &_sibling, &_tail);
+      }
+      else {zzFAIL(1,zzerr6,&zzMissSet,&zzMissText,&zzBadTok,&zzBadText,&zzErrk); goto fail;}
+    }
+    zzEXIT(zztasp2);
+    }
+  }
+  zzEXIT(zztasp1);
+  return;
+fail:
+  zzEXIT(zztasp1);
+  zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
+  zzresynch(setwd2, 0x40);
+  }
+}
+
+void
+#ifdef __USE_PROTOS
+splitTube(AST**_root)
+#else
+splitTube(_root)
+AST **_root;
+#endif
+{
+  zzRULE;
+  zzBLOCK(zztasp1);
+  zzMake0;
+  {
+  zzmatch(SPLIT); zzsubroot(_root, &_sibling, &_tail); zzCONSUME;
+  zzmatch(ID); zzsubchild(_root, &_sibling, &_tail); zzCONSUME;
+  zzEXIT(zztasp1);
+  return;
+fail:
+  zzEXIT(zztasp1);
+  zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
+  zzresynch(setwd2, 0x80);
   }
 }
 
@@ -629,241 +754,7 @@ AST **_root;
 fail:
   zzEXIT(zztasp1);
   zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
-  zzresynch(setwd2, 0x40);
-  }
-}
-
-void
-#ifdef __USE_PROTOS
-tubeDec(AST**_root)
-#else
-tubeDec(_root)
-AST **_root;
-#endif
-{
-  zzRULE;
-  zzBLOCK(zztasp1);
-  zzMake0;
-  {
-  if ( (LA(1)==TUBE) ) {
-    zzmatch(TUBE); zzsubroot(_root, &_sibling, &_tail); zzCONSUME;
-    numExpr(zzSTR); zzlink(_root, &_sibling, &_tail);
-    numExpr(zzSTR); zzlink(_root, &_sibling, &_tail);
-  }
-  else {
-    if ( (LA(1)==MERGE) ) {
-      mergeExpr(zzSTR); zzlink(_root, &_sibling, &_tail);
-    }
-    else {zzFAIL(1,zzerr8,&zzMissSet,&zzMissText,&zzBadTok,&zzBadText,&zzErrk); goto fail;}
-  }
-  zzEXIT(zztasp1);
-  return;
-fail:
-  zzEXIT(zztasp1);
-  zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
-  zzresynch(setwd2, 0x80);
-  }
-}
-
-void
-#ifdef __USE_PROTOS
-mergeExpr(AST**_root)
-#else
-mergeExpr(_root)
-AST **_root;
-#endif
-{
-  zzRULE;
-  zzBLOCK(zztasp1);
-  zzMake0;
-  {
-  zzmatch(MERGE); zzsubroot(_root, &_sibling, &_tail); zzCONSUME;
-  {
-    zzBLOCK(zztasp2);
-    zzMake0;
-    {
-    if ( (LA(1)==ID) ) {
-      zzmatch(ID); zzsubchild(_root, &_sibling, &_tail); zzCONSUME;
-    }
-    else {
-      if ( (setwd3[LA(1)]&0x1) ) {
-        tubeDec(zzSTR); zzlink(_root, &_sibling, &_tail);
-      }
-      else {zzFAIL(1,zzerr9,&zzMissSet,&zzMissText,&zzBadTok,&zzBadText,&zzErrk); goto fail;}
-    }
-    zzEXIT(zztasp2);
-    }
-  }
-  {
-    zzBLOCK(zztasp2);
-    zzMake0;
-    {
-    if ( (LA(1)==ID) ) {
-      zzmatch(ID); zzsubchild(_root, &_sibling, &_tail); zzCONSUME;
-    }
-    else {
-      if ( (LA(1)==CON) ) {
-        connectorDec(zzSTR); zzlink(_root, &_sibling, &_tail);
-      }
-      else {zzFAIL(1,zzerr10,&zzMissSet,&zzMissText,&zzBadTok,&zzBadText,&zzErrk); goto fail;}
-    }
-    zzEXIT(zztasp2);
-    }
-  }
-  {
-    zzBLOCK(zztasp2);
-    zzMake0;
-    {
-    if ( (LA(1)==ID) ) {
-      zzmatch(ID); zzsubchild(_root, &_sibling, &_tail); zzCONSUME;
-    }
-    else {
-      if ( (setwd3[LA(1)]&0x2) ) {
-        tubeDec(zzSTR); zzlink(_root, &_sibling, &_tail);
-      }
-      else {zzFAIL(1,zzerr11,&zzMissSet,&zzMissText,&zzBadTok,&zzBadText,&zzErrk); goto fail;}
-    }
-    zzEXIT(zztasp2);
-    }
-  }
-  zzEXIT(zztasp1);
-  return;
-fail:
-  zzEXIT(zztasp1);
-  zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
-  zzresynch(setwd3, 0x4);
-  }
-}
-
-void
-#ifdef __USE_PROTOS
-connectorDec(AST**_root)
-#else
-connectorDec(_root)
-AST **_root;
-#endif
-{
-  zzRULE;
-  zzBLOCK(zztasp1);
-  zzMake0;
-  {
-  zzmatch(CON); zzsubroot(_root, &_sibling, &_tail); zzCONSUME;
-  numExpr(zzSTR); zzlink(_root, &_sibling, &_tail);
-  zzEXIT(zztasp1);
-  return;
-fail:
-  zzEXIT(zztasp1);
-  zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
-  zzresynch(setwd3, 0x8);
-  }
-}
-
-void
-#ifdef __USE_PROTOS
-tvecDec(AST**_root)
-#else
-tvecDec(_root)
-AST **_root;
-#endif
-{
-  zzRULE;
-  zzBLOCK(zztasp1);
-  zzMake0;
-  {
-  zzmatch(TVEC); zzsubroot(_root, &_sibling, &_tail); zzCONSUME;
-  zzmatch(OF);  zzCONSUME;
-  numExpr(zzSTR); zzlink(_root, &_sibling, &_tail);
-  zzEXIT(zztasp1);
-  return;
-fail:
-  zzEXIT(zztasp1);
-  zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
-  zzresynch(setwd3, 0x10);
-  }
-}
-
-void
-#ifdef __USE_PROTOS
-length(AST**_root)
-#else
-length(_root)
-AST **_root;
-#endif
-{
-  zzRULE;
-  zzBLOCK(zztasp1);
-  zzMake0;
-  {
-  zzmatch(LEN); zzsubroot(_root, &_sibling, &_tail); zzCONSUME;
-  zzmatch(27);  zzCONSUME;
-  {
-    zzBLOCK(zztasp2);
-    zzMake0;
-    {
-    if ( (LA(1)==ID) ) {
-      zzmatch(ID); zzsubchild(_root, &_sibling, &_tail); zzCONSUME;
-    }
-    else {
-      if ( (setwd3[LA(1)]&0x20) ) {
-        tubeDec(zzSTR); zzlink(_root, &_sibling, &_tail);
-      }
-      else {zzFAIL(1,zzerr12,&zzMissSet,&zzMissText,&zzBadTok,&zzBadText,&zzErrk); goto fail;}
-    }
-    zzEXIT(zztasp2);
-    }
-  }
-  zzmatch(29);  zzCONSUME;
-  zzEXIT(zztasp1);
-  return;
-fail:
-  zzEXIT(zztasp1);
-  zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
-  zzresynch(setwd3, 0x40);
-  }
-}
-
-void
-#ifdef __USE_PROTOS
-diameter(AST**_root)
-#else
-diameter(_root)
-AST **_root;
-#endif
-{
-  zzRULE;
-  zzBLOCK(zztasp1);
-  zzMake0;
-  {
-  zzmatch(DIAM); zzsubroot(_root, &_sibling, &_tail); zzCONSUME;
-  zzmatch(27);  zzCONSUME;
-  {
-    zzBLOCK(zztasp2);
-    zzMake0;
-    {
-    if ( (LA(1)==ID) ) {
-      zzmatch(ID); zzsubchild(_root, &_sibling, &_tail); zzCONSUME;
-    }
-    else {
-      if ( (setwd3[LA(1)]&0x80) ) {
-        tubeDec(zzSTR); zzlink(_root, &_sibling, &_tail);
-      }
-      else {
-        if ( (LA(1)==CON) ) {
-          connectorDec(zzSTR); zzlink(_root, &_sibling, &_tail);
-        }
-        else {zzFAIL(1,zzerr13,&zzMissSet,&zzMissText,&zzBadTok,&zzBadText,&zzErrk); goto fail;}
-      }
-    }
-    zzEXIT(zztasp2);
-    }
-  }
-  zzmatch(29);  zzCONSUME;
-  zzEXIT(zztasp1);
-  return;
-fail:
-  zzEXIT(zztasp1);
-  zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
-  zzresynch(setwd4, 0x1);
+  zzresynch(setwd3, 0x1);
   }
 }
 
@@ -897,7 +788,7 @@ AST **_root;
 fail:
   zzEXIT(zztasp1);
   zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
-  zzresynch(setwd4, 0x2);
+  zzresynch(setwd3, 0x2);
   }
 }
 
@@ -931,7 +822,7 @@ AST **_root;
 fail:
   zzEXIT(zztasp1);
   zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
-  zzresynch(setwd4, 0x4);
+  zzresynch(setwd3, 0x4);
   }
 }
 
@@ -955,9 +846,9 @@ AST **_root;
       zzmatch(NOT); zzsubroot(_root, &_sibling, &_tail); zzCONSUME;
     }
     else {
-      if ( (setwd4[LA(1)]&0x8) ) {
+      if ( (setwd3[LA(1)]&0x8) ) {
       }
-      else {zzFAIL(1,zzerr14,&zzMissSet,&zzMissText,&zzBadTok,&zzBadText,&zzErrk); goto fail;}
+      else {zzFAIL(1,zzerr8,&zzMissSet,&zzMissText,&zzBadTok,&zzBadText,&zzErrk); goto fail;}
     }
     zzEXIT(zztasp2);
     }
@@ -968,7 +859,7 @@ AST **_root;
 fail:
   zzEXIT(zztasp1);
   zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
-  zzresynch(setwd4, 0x10);
+  zzresynch(setwd3, 0x10);
   }
 }
 
@@ -988,12 +879,12 @@ AST **_root;
     zzmatch(BOOL); zzsubchild(_root, &_sibling, &_tail); zzCONSUME;
   }
   else {
-    if ( (setwd4[LA(1)]&0x20) ) {
-      boolExpr(zzSTR); zzlink(_root, &_sibling, &_tail);
+    if ( (setwd3[LA(1)]&0x20) ) {
+      vecState(zzSTR); zzlink(_root, &_sibling, &_tail);
     }
     else {
-      if ( (setwd4[LA(1)]&0x40) ) {
-        vecState(zzSTR); zzlink(_root, &_sibling, &_tail);
+      if ( (setwd3[LA(1)]&0x40) ) {
+        boolExpr(zzSTR); zzlink(_root, &_sibling, &_tail);
       }
       else {
         if ( (LA(1)==27) ) {
@@ -1001,7 +892,7 @@ AST **_root;
           boolOr(zzSTR); zzlink(_root, &_sibling, &_tail);
           zzmatch(29);  zzCONSUME;
         }
-        else {zzFAIL(1,zzerr15,&zzMissSet,&zzMissText,&zzBadTok,&zzBadText,&zzErrk); goto fail;}
+        else {zzFAIL(1,zzerr9,&zzMissSet,&zzMissText,&zzBadTok,&zzBadText,&zzErrk); goto fail;}
       }
     }
   }
@@ -1010,7 +901,7 @@ AST **_root;
 fail:
   zzEXIT(zztasp1);
   zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
-  zzresynch(setwd4, 0x80);
+  zzresynch(setwd3, 0x80);
   }
 }
 
@@ -1041,7 +932,7 @@ AST **_root;
 fail:
   zzEXIT(zztasp1);
   zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
-  zzresynch(setwd5, 0x1);
+  zzresynch(setwd4, 0x1);
   }
 }
 
@@ -1075,7 +966,7 @@ AST **_root;
 fail:
   zzEXIT(zztasp1);
   zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
-  zzresynch(setwd5, 0x2);
+  zzresynch(setwd4, 0x2);
   }
 }
 
@@ -1109,7 +1000,7 @@ AST **_root;
 fail:
   zzEXIT(zztasp1);
   zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
-  zzresynch(setwd5, 0x4);
+  zzresynch(setwd4, 0x4);
   }
 }
 
@@ -1140,7 +1031,7 @@ AST **_root;
         if ( (LA(1)==DIAM) ) {
           diameter(zzSTR); zzlink(_root, &_sibling, &_tail);
         }
-        else {zzFAIL(1,zzerr16,&zzMissSet,&zzMissText,&zzBadTok,&zzBadText,&zzErrk); goto fail;}
+        else {zzFAIL(1,zzerr10,&zzMissSet,&zzMissText,&zzBadTok,&zzBadText,&zzErrk); goto fail;}
       }
     }
   }
@@ -1149,6 +1040,6 @@ AST **_root;
 fail:
   zzEXIT(zztasp1);
   zzsyn(zzMissText, zzBadTok, (ANTLRChar *)"", zzMissSet, zzMissTok, zzErrk, zzBadText);
-  zzresynch(setwd5, 0x8);
+  zzresynch(setwd4, 0x8);
   }
 }

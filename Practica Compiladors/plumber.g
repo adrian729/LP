@@ -64,31 +64,27 @@ void zzcr_attr(Attrib *attr, int type, char *text) {
       attr->kind = "id";
       attr->text = text;
       break;
-    case NUM:   
+    case NUM:
     case PLUS:
-    case TIMES:    
+    case TIMES:
     case LEN:
     case DIAM:
       attr->kind = "number";
       attr->text = text;
       break;
     case BOOL:
-    case COMP:
-    case EMPTY:
-    case FULL:
     case NOT:
     case AND:
     case OR:
+    case COMP:
+    case EMPTY:
+    case FULL:
       attr->kind = "boolean";
       attr->text = text;
       break;
     case TUBE:
     case MERGE:
       attr->kind = "tube";
-      attr->text = text;
-      break;
-    case SPLIT:
-      attr->kind = "split";
       attr->text = text;
       break;
     case CON:
@@ -99,14 +95,18 @@ void zzcr_attr(Attrib *attr, int type, char *text) {
       attr->kind = "tubeVector";
       attr->text = text;
       break;
-    case WHILE:
-    case PUSH:
-    case POP:
-      attr->kind = "instruction";
+    case SPLIT:
+      attr->kind = "split";
       attr->text = text;
       break;
     case ASSIG:
       attr->kind = "assignation";
+      attr->text = text;
+      break;
+    case WHILE:
+    case PUSH:
+    case POP:
+      attr->kind = "instruction";
       attr->text = text;
       break;
     default:
@@ -263,23 +263,23 @@ int main() {
 #lexclass START
 
 // Keywords
-#token TUBE "TUBE"            //OK
-#token CON "CONNECTOR"        //OK
+#token TUBE "TUBE"
+#token CON "CONNECTOR"
 
-#token SPLIT "SPLIT"          //OK
-#token MERGE "MERGE"          //OK
-#token LEN "LENGTH"           //OK
-#token DIAM "DIAMETER"        //OK
+#token SPLIT "SPLIT"
+#token MERGE "MERGE"
+#token LEN "LENGTH"
+#token DIAM "DIAMETER"
 
-#token TVEC "TUBEVECTOR"      //OK
+#token TVEC "TUBEVECTOR"
 #token OF "OF"
 
-#token PUSH "PUSH"            //OK
-#token POP "POP"              //OK
-#token FULL "FULL"            //OK
-#token EMPTY "EMPTY"          //OK
+#token PUSH "PUSH"
+#token POP "POP"
+#token FULL "FULL"
+#token EMPTY "EMPTY"
 
-#token WHILE "WHILE"          //OK
+#token WHILE "WHILE"
 #token ENDWHILE "ENDWHILE"
 
 
@@ -312,6 +312,7 @@ plumber: ops;
 
 ops: (instruction <<#0=createASTlist(_sibling);>>)*;
 
+
 instruction: 
     assignation // create a new tube or connector, or a vector of tubes or split a tube in another two
     | length    // writes length
@@ -320,39 +321,37 @@ instruction:
     | vecOp     // POP or PUSH a vector
     ;
 
+// Instructions
 assignation:
-    ID ASSIG^ (ID | tubeDec | connectorDec | tvecDec)
+    ID ASSIG^ (ID | tubeDec | connectorDec | tvecDec | mergeExpr)
     | "\("! ID ","! ID "\)"! ASSIG^ splitTube
     ;
 
-splitTube: SPLIT^ (ID | tubeDec) ;
+length: LEN^ "\("! ID "\)"! ;
+
+diameter: DIAM^ "\("! ID "\)"! ;
 
 wLoop: WHILE^ "\("! boolOr "\)"! ops ENDWHILE! ;
 
-intW: ID ID <<#0=createASTlist(_sibling);>> ;
-
 vecOp: 
-    PUSH^ ID (ID | tubeDec)
+    PUSH^ ID ID
     | POP^ ID ID
     ;
 
-vecState: (EMPTY^ | FULL^) "\("! ID "\)"! ;
-
-tubeDec:
-    TUBE^ numExpr numExpr
-    | mergeExpr
-    ;
-
-mergeExpr: MERGE^ (ID | tubeDec) (ID | connectorDec) (ID | tubeDec) ;
+// functions
+tubeDec: TUBE^ numExpr numExpr ;
 
 connectorDec: CON^ numExpr ;
 
 tvecDec: TVEC^ OF! numExpr ;
 
-length: LEN^ "\("! (ID | tubeDec) "\)"! ;
+mergeExpr: MERGE^ (ID | mergeExpr) ID (ID | mergeExpr) ;
 
-diameter: DIAM^ "\("! (ID | tubeDec | connectorDec) "\)"! ;
+splitTube: SPLIT^ ID ;
 
+vecState: (EMPTY^ | FULL^) "\("! ID "\)"! ;
+
+// Expresions
 boolOr: boolAnd (OR^ boolAnd)* ;
 
 boolAnd: boolNot (AND^ boolNot)* ;
@@ -361,8 +360,8 @@ boolNot: (NOT^ | ) boolAtom ;
 
 boolAtom:
     BOOL
-    | boolExpr
     | vecState
+    | boolExpr
     | "\("! boolOr "\)"!
     ;
 
@@ -378,5 +377,6 @@ atom:
     | length
     | diameter
     ;
+
 
 

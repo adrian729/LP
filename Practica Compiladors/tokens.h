@@ -60,9 +60,15 @@ extern void assignation();
 #endif
 
 #ifdef __USE_PROTOS
-void splitTube(AST**_root);
+void length(AST**_root);
 #else
-extern void splitTube();
+extern void length();
+#endif
+
+#ifdef __USE_PROTOS
+void diameter(AST**_root);
+#else
+extern void diameter();
 #endif
 
 #ifdef __USE_PROTOS
@@ -72,33 +78,15 @@ extern void wLoop();
 #endif
 
 #ifdef __USE_PROTOS
-void intW(AST**_root);
-#else
-extern void intW();
-#endif
-
-#ifdef __USE_PROTOS
 void vecOp(AST**_root);
 #else
 extern void vecOp();
 #endif
 
 #ifdef __USE_PROTOS
-void vecState(AST**_root);
-#else
-extern void vecState();
-#endif
-
-#ifdef __USE_PROTOS
 void tubeDec(AST**_root);
 #else
 extern void tubeDec();
-#endif
-
-#ifdef __USE_PROTOS
-void mergeExpr(AST**_root);
-#else
-extern void mergeExpr();
 #endif
 
 #ifdef __USE_PROTOS
@@ -114,15 +102,21 @@ extern void tvecDec();
 #endif
 
 #ifdef __USE_PROTOS
-void length(AST**_root);
+void mergeExpr(AST**_root);
 #else
-extern void length();
+extern void mergeExpr();
 #endif
 
 #ifdef __USE_PROTOS
-void diameter(AST**_root);
+void splitTube(AST**_root);
 #else
-extern void diameter();
+extern void splitTube();
+#endif
+
+#ifdef __USE_PROTOS
+void vecState(AST**_root);
+#else
+extern void vecState();
 #endif
 
 #ifdef __USE_PROTOS
@@ -182,16 +176,9 @@ extern SetWordType zzerr4[];
 extern SetWordType zzerr5[];
 extern SetWordType zzerr6[];
 extern SetWordType zzerr7[];
-extern SetWordType zzerr8[];
 extern SetWordType setwd2[];
+extern SetWordType zzerr8[];
 extern SetWordType zzerr9[];
-extern SetWordType zzerr10[];
-extern SetWordType zzerr11[];
-extern SetWordType zzerr12[];
-extern SetWordType zzerr13[];
 extern SetWordType setwd3[];
-extern SetWordType zzerr14[];
-extern SetWordType zzerr15[];
+extern SetWordType zzerr10[];
 extern SetWordType setwd4[];
-extern SetWordType zzerr16[];
-extern SetWordType setwd5[];

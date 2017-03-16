@@ -11,8 +11,8 @@ allNew: clear all
 plumber.exe:
 	antlr -gt plumber.g
 	dlg -ci parser.dlg scan.c
-	g++ -std=c++11 -Wno-write-strings -o plumber.exe plumber.c scan.c err.c -I/home/brutus729/Documents/FIB/LP/Pccts/h
-	
+	g++ -std=c++11 -Wno-write-strings -o plumber.exe plumber.c scan.c err.c -I/home/brutus729/Documents/FIB/LP/pccts/h
+
 clear: clean dist-clean
 
 clean:
