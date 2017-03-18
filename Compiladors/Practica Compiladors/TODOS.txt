@@ -1,0 +1,10 @@
+afegir try-catch i throw exception per captar els errors i llençar el missatge adient (i evitar que peti tot, que no ho ha de fer)
+
+
+TO ASK:
+
+-> nomes ID a les funcions? (length, diameter...) -> NO
+
+-> si hi ha algun error de lexic/sintaxis, ha de petar tot?? -> no cal tocar res
+
+-> quina versio d'antlr fem servir?¿? -> OK!
