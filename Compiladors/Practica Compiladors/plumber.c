@@ -87,6 +87,31 @@ class WrongTypeException : public exception {
   }
 };
 
+class WrongNumberException : public exception {
+  string err_msg;
+  public:
+  WrongNumberException(const int& size)
+  : err_msg(string("ERROR: THE NUMBER IS ") + to_string(size) + string(" AND SHOULD BE A NATURAL NUMBER."))
+  {}
+  
+    virtual const char* what() const throw() {
+    return err_msg.c_str();
+  }
+};
+
+class IndexOutOfBoundsException : public exception {
+  string err_msg;
+  public:
+  IndexOutOfBoundsException(const int& index, const int& size)
+  : err_msg(string("ERROR: INDEX OUT OF BOUNDS - INDEX ") + to_string(index) + string(" OF ") + to_string(size) + string("."))
+  {}
+  
+    virtual const char* what() const throw() {
+    return err_msg.c_str();
+  }
+};
+
+
 
 /**DATA STRUCTURES**/
 
@@ -103,9 +128,12 @@ typedef struct {
 //TubeVector
 typedef struct {
   vector<Tube> tubes; // vector of tubes.
-  int size, top; // vector size and next item index.
+  int top; // vector size and next item index.
 } TubeVector;
 
+const string TubeType = "tube";
+const string ConnectorType = "connector";
+const string TubeVectorType = "tubeVector";
 
 // map table to handle or ID's of existing objects
 map<string, string> stock; // ID, typeOfObject
@@ -291,6 +319,7 @@ Tube evaluateTubeExpression(AST*);
 int diameter(string id);
 int evaluateNumberExpression(AST*);
 bool evaluateBooleanExpression(AST*);
+pair<Tube, Tube> evaluateSplitExpression(string);
 bool evaluateAssignationExpression(AST*);
 bool evaluateInstructionExpression(AST*);
 void executePlumber(AST*);
@@ -310,15 +339,20 @@ if(a->kind == "connector") {
 cout << "connector" << endl;
 /*ENDCHI*/
 c.diameter = evaluateNumberExpression(child(a, 0));
+// Diameter should be a natural number.
+if(c.diameter < 0) {
+throw WrongNumberException(c.diameter);
 }
+
+  }
 else if(a->kind == "id"){
 /*CHI:*/
-cout << "id->connector" << endl;
+cout << "id->connector " << a->text << endl;
 /*ENDCHI*/
 // Iterator to the id on stock map
 map<string,string>::iterator stockIt = stock.find(a->text);
 // If ID exists and it is a tube.
-if(stockIt != stock.end() && stockIt->second == "connector"){
+if(stockIt != stock.end() && stockIt->second == ConnectorType){
 c = connectorStock.find(a->text)->second;
 }
 }
@@ -332,27 +366,43 @@ return c;
 * @return The tube described by the expression.
 */
 Tube evaluateTubeExpression(AST *a) {
+// TODO: MERGE!
 Tube t;
 if(a->kind == "tube"){
 if(a->text == "MERGE") {
 /*CHI:*/
-cout << "merge" << endl;
+cout << "   merge " << endl;
 /*ENDCHI*/
 Tube t1 = evaluateTubeExpression(child(a, 0));
 Connector c = evaluateConnectorExpression(child(a, 1));
 Tube t2 = evaluateTubeExpression(child(a, 2));
+/*CHI:*/
+cout << "   merged " << child(a, 0)->text << " " << child(a, 1)->text << " " << child(a, 2)->text << endl;
+/*ENDCHI*/
+
+      // TODO: A REAL MEGE!!!!
+t.length = 12;
+t.diameter = 4;
 }
 else if(a->text == "TUBE") {
 /*CHI:*/
-cout << "tube" << endl;
+cout << "   tube" << endl;
 /*ENDCHI*/
 t.length = evaluateNumberExpression(child(a, 0));
+// Length should be a natural number.
+if(t.length < 0) {
+throw WrongNumberException(t.length);
+}
 t.diameter = evaluateNumberExpression(child(a, 1));
+// Diameter should be a natural number.
+if(t.diameter < 0) {
+throw WrongNumberException(t.diameter);
+}
 }
 }
 else if(a->kind == "id") {
 /*CHI:*/
-cout << "id->tube" << endl;
+cout << "   id->tube " << a->text << endl;
 /*ENDCHI*/
 // Iterator to the id on stock map
 map<string,string>::iterator stockIt = stock.find(a->text);
@@ -364,9 +414,9 @@ cout << "ERR: ID " << a->text << " NOT FOUND." << endl;
 throw NoIdException(a->text);
 }
 // If it is not a tube throw an exception.
-if(stockIt->second != "tube") {
+if(stockIt->second != TubeType) {
 /*CHI:*/
-cout << "ERR: ID " << a->text << " IS NOT A TUBE." << endl;
+cout << "ERR: " << a->text << " IS NOT A TUBE." << endl;
 /*ENDCHI*/
 throw WrongTypeException(a->text, "TUBE");
 }
@@ -383,17 +433,21 @@ return t;
 */
 int diameter(string id) {
 map<string,string>::iterator stockIt = stock.find(id);
-if(stockIt != stock.end()) {
+// If ID doesn't exists, throw an excpeption.
+if(stockIt == stock.end()) {
+/*CHI:*/
+cout << "ERR: ID " << id << " NOT FOUND." << endl;
+/*ENDCHI*/
+throw NoIdException(id);
+}
 // tube
-if(stockIt->second == "tube") {
+if(stockIt->second == TubeType) {
 return (tubeStock.find(id)->second).diameter;
 }
 // connector
-else if(stockIt->second == "connector") {
+else if(stockIt->second == ConnectorType) {
 return (connectorStock.find(id)->second).diameter;
 }
-}
-// TODO: else throw exception!
 return -1;
 }
 
@@ -435,50 +489,109 @@ return stoi(a->text);
 * @return The value of the expression.
 */
 bool evaluateBooleanExpression(AST *a){
-//TODO: FULL, EMPTY
 if(a->text == "FULL") {
 /*CHI:*/
-cout << "full" << endl;
+cout << "   full" << endl;
 /*ENDCHI*/
+// It should be an id.
+if(child(a, 0)->kind != "id") {
+/*CHI:*/
+cout << "ERR: " << child(a, 0)->text << " IS NOT A VALID ID." << endl;
+/*ENDCHI*/
+throw WrongTypeException(child(a, 0)->text, "VALID ID");
+}
+
+    // Iterator to the id on stock map
+map<string,string>::iterator stockIt = stock.find(child(a, 0)->text);
+// If ID doesn't exists, throw an excpeption.
+if(stockIt == stock.end()) {
+/*CHI:*/
+cout << "ERR: ID " << child(a, 0)->text << " NOT FOUND." << endl;
+/*ENDCHI*/
+throw NoIdException(child(a, 0)->text);
+}
+// It should point to a tube vector.
+if(stock[child(a, 0)->text] != TubeVectorType) {
+/*CHI:*/
+cout << "ERR: " << child(a, 0)->text << " IS NOT A TUBE VECTOR." << endl;
+/*ENDCHI*/
+throw WrongTypeException(child(a, 0)->text, "TUBE VECTOR");
+}
+
+    /*CHI:*/
+bool full = tubeVectorStock[child(a, 0)->text].top == tubeVectorStock[child(a, 0)->text].tubes.size();
+cout << "     " << child(a, 0)->text << " " << stock[child(a, 0)->text] << " full " << full << endl;
+/*ENDCHI*/
+return tubeVectorStock[child(a, 0)->text].top == tubeVectorStock[child(a, 0)->text].tubes.size();
 }
 else if(a->text == "EMPTY") {
 /*CHI:*/
-cout << "empty" << endl;
+cout << "   empty" << endl;
 /*ENDCHI*/
+// It should be an id.
+if(child(a, 0)->kind != "id") {
+/*CHI:*/
+cout << "ERR: " << child(a, 0)->text << " IS NOT A VALID ID." << endl;
+/*ENDCHI*/
+throw WrongTypeException(child(a, 0)->text, "VALID ID");
+}
+
+    // Iterator to the id on stock map
+map<string,string>::iterator stockIt = stock.find(child(a, 0)->text);
+// If ID doesn't exists, throw an excpeption.
+if(stockIt == stock.end()) {
+/*CHI:*/
+cout << "ERR: ID " << child(a, 0)->text << " NOT FOUND." << endl;
+/*ENDCHI*/
+throw NoIdException(child(a, 0)->text);
+}
+// It should point to a tube vector.
+if(stock[child(a, 0)->text] != TubeVectorType) {
+/*CHI:*/
+cout << "ERR: " << child(a, 0)->text << " IS NOT A TUBE VECTOR." << endl;
+/*ENDCHI*/
+throw WrongTypeException(child(a, 0)->text, "TUBE VECTOR");
+}
+
+    /*CHI:*/
+bool empty = tubeVectorStock[child(a, 0)->text].top == 0;
+cout << "     " << child(a, 0)->text << " " << stock[child(a, 0)->text] << " empty " << empty << endl;
+/*ENDCHI*/
+return tubeVectorStock[child(a, 0)->text].top == 0;
 }
 else if(a->text == "<") {
 /*CHI:*/
-cout << "<" << endl;
+cout << "   <" << endl;
 /*ENDCHI*/
 return evaluateNumberExpression(child(a, 0)) < evaluateNumberExpression(child(a, 1));
 }
 else if(a->text == ">") {
 /*CHI:*/
-cout << ">" << endl;
+cout << "   >" << endl;
 /*ENDCHI*/
 return evaluateNumberExpression(child(a, 0)) > evaluateNumberExpression(child(a, 1));
 }
 else if(a->text == "==") {
 /*CHI:*/
-cout << "==" << endl;
+cout << "   ==" << endl;
 /*ENDCHI*/
 return evaluateNumberExpression(child(a, 0)) == evaluateNumberExpression(child(a, 1));
 }
 else if(a->text == "OR") {
 /*CHI:*/
-cout << "OR" << endl;
+cout << "   OR" << endl;
 /*ENDCHI*/
 return evaluateBooleanExpression(child(a, 0)) || evaluateBooleanExpression(child(a, 1));
 }
 else if(a->text == "AND") {
 /*CHI:*/
-cout << "AND" << endl;
+cout << "   AND" << endl;
 /*ENDCHI*/
 return evaluateBooleanExpression(child(a, 0)) && evaluateBooleanExpression(child(a, 1));
 }
 else if(a->text == "NOT") {
 /*CHI:*/
-cout << "NOT" << endl;
+cout << "   NOT" << endl;
 /*ENDCHI*/
 return !evaluateBooleanExpression(child(a, 0));
 }
@@ -490,6 +603,42 @@ return true;
   return false;
 }
 
+pair<Tube, Tube> evaluateSplitExpression(string id) {
+// Iterator to the id on stock map
+map<string,string>::iterator stockIt = stock.find(id);
+// If ID doesn't exists, throw an excpeption.
+if(stockIt == stock.end()) {
+/*CHI:*/
+cout << "ERR: ID " << id << " NOT FOUND." << endl;
+/*ENDCHI*/
+throw NoIdException(id);
+}
+// If it is not a tube throw an exception.
+if(stockIt->second != TubeType) {
+/*CHI:*/
+cout << "ERR: " << id << " IS NOT A TUBE." << endl;
+/*ENDCHI*/
+throw WrongTypeException(id, "TUBE");
+}
+
+  Tube t, t1, t2;
+t = tubeStock.find(id)->second;
+t1.length = t.length / 2;
+// Length should be a natural.
+if(t1.length < 0) {
+throw WrongNumberException(t1.length);
+}
+t1.diameter = t.diameter;
+t2.length = t.length / 2 + t.length % 2; // If odd t length, t2 larger than t1.
+// Length should be a natural.
+if(t2.length < 0) {
+throw WrongNumberException(t2.length);
+}
+t2.diameter = t.diameter;
+
+  return pair<Tube, Tube> (t1, t2);
+}
+
 /**
 * Evaluates the expression represented in the AST a.
 * It must be an assignation.
@@ -497,11 +646,236 @@ return true;
 * @return Boolean true if everything OK, false if something have gone wrong.
 */
 bool evaluateAssignationExpression(AST *a){
-/*CHI:*/
-cout << "Assign" << endl;
+
+  /*CHI:*/
+cout << " Assign" << endl;
 /*ENDCHI*/
 
-  
+  AST *child0 = child(a, 0); // must be an ID
+// If it is not an id, throw exception.
+if(child0->kind != "id") {
+/*CHI:*/
+cout << "ERR: " << child0->text << " IS NOT A VALID ID." << endl;
+/*ENDCHI*/
+throw WrongTypeException(child0->text, "VALID ID");
+}
+
+  if(child(a, 2) && child(a, 2)->kind == "split") { // If child 2 exists and it is split
+/*CHI:*/
+cout << " Split" << endl;
+/*ENDCHI*/
+
+    AST *child1 = child(a, 1); // must be an ID
+// If it is not an id, throw exception.
+if(child1->kind != "id") {
+/*CHI:*/
+cout << "ERR: " << child1->text << " IS NOT A VALID ID." << endl;
+/*ENDCHI*/
+throw WrongTypeException(child1->text, "VALID ID");
+}
+AST *tubeToSplit = child(child(a, 2), 0);
+// If it is not an id, throw exception.
+if(tubeToSplit->kind != "id") {
+/*CHI:*/
+cout << "ERR: " << tubeToSplit->text << " IS NOT A VALID ID." << endl;
+/*ENDCHI*/
+throw WrongTypeException(tubeToSplit->text, "VALID ID");
+}
+/*CHI:*/
+cout << "   Spliting " << tubeToSplit->text << endl;
+/*ENDCHI*/
+
+    // Create new tubes.
+pair<Tube, Tube> splitedTube = evaluateSplitExpression(tubeToSplit->text);
+// Erase objects of IDs if replaced.
+// Iterator to the id on stock map
+map<string,string>::iterator stockIt = stock.find(child0->text);
+// If ID already exists (and it's not a Tube), erase the object!
+if(stockIt != stock.end()) {
+if(stock[child0->text] == ConnectorType) {
+connectorStock.erase(child0->text);
+}
+else if(stock[child0->text] == TubeVectorType) {
+tubeVectorStock.erase(child0->text);
+}
+}
+// Iterator to the id on stock map
+stockIt = stock.find(child1->text);
+// If ID already exists (and it's not a Tube), erase the object!
+if(stockIt != stock.end()) {
+if(stock[child1->text] == ConnectorType) {
+connectorStock.erase(child1->text);
+}
+else if(stock[child1->text] == TubeVectorType) {
+tubeVectorStock.erase(child1->text);
+}
+}
+// Create new tubes
+stock[child0->text] = TubeType;
+stock[child1->text] = TubeType;
+tubeStock[child0->text] = splitedTube.first;
+tubeStock[child1->text] = splitedTube.second;
+// Destroy old tube from stock and tubeStock.
+stock.erase(tubeToSplit->text);
+tubeStock.erase(tubeToSplit->text);
+/*CHI:*/
+cout << " Split made " << child0->text << endl;
+/*ENDCHI*/
+/*CHI:*/
+cout << " Split made " << child1->text << endl;
+/*ENDCHI*/
+
+    return true;
+}
+else if(child(a, 1)->kind == "tubeVector") {
+/*CHI:*/
+cout << " TubeVector" << endl;
+/*ENDCHI*/
+
+    int size = evaluateNumberExpression(child(child(a, 1), 0));
+// Size should be a natural number.
+if(size < 0) {
+throw WrongNumberException(size);
+}
+
+    /*CHI:*/
+cout << " Size " << size << endl;
+/*ENDCHI*/
+// Erase objects of IDs if replaced.
+// Iterator to the id on stock map
+map<string,string>::iterator stockIt = stock.find(child0->text);
+// If ID already exists (and it's not a Tube), erase the object!
+if(stockIt != stock.end()) {
+if(stock[child0->text] == TubeType) {
+tubeStock.erase(child0->text);
+}
+else if(stock[child0->text] == ConnectorType) {
+connectorStock.erase(child0->text);
+}
+}
+// Create tubeVector.
+TubeVector tvec;
+tvec.tubes = vector<Tube>(size);
+tvec.top = 0;
+stock[child0->text] = TubeVectorType;
+tubeVectorStock[child0->text] = tvec;
+/*CHI:*/
+cout << "   TVEC->" << child0->text << endl;
+/*ENDCHI*/
+
+    return true;
+}
+else if(child(a, 1)->kind == "connector") {
+/*CHI:*/
+cout << " Connector" << endl;
+/*ENDCHI*/
+
+    int diam = evaluateNumberExpression(child(child(a, 1), 0));
+// Diameter should be a natural number.
+if(diam < 0) {
+throw WrongNumberException(diam);
+}
+
+    // Erase objects of IDs if replaced.
+// Iterator to the id on stock map
+map<string,string>::iterator stockIt = stock.find(child0->text);
+// If ID already exists (and it's not a Tube), erase the object!
+if(stockIt != stock.end()) {
+if(stock[child0->text] == TubeType) {
+tubeStock.erase(child0->text);
+}
+else if(stock[child0->text] == TubeVectorType) {
+tubeVectorStock.erase(child0->text);
+}
+}
+Connector con;
+con.diameter = diam;
+stock[child0->text] = ConnectorType;
+connectorStock[child0->text] = con;
+/*CHI:*/
+cout << "   CON->" << child0->text << endl;
+/*ENDCHI*/
+
+    return true;
+}
+else if(child(a, 1)->kind == "tube") {
+/*CHI:*/
+cout << " Tube" << endl;
+/*ENDCHI*/
+
+    Tube t = evaluateTubeExpression(child(a, 1));
+// Erase objects of IDs if replaced.
+// Iterator to the id on stock map
+map<string,string>::iterator stockIt = stock.find(child0->text);
+// If ID already exists (and it's not a Tube), erase the object!
+if(stockIt != stock.end()) {
+if(stock[child0->text] == ConnectorType) {
+connectorStock.erase(child0->text);
+}
+else if(stock[child0->text] == TubeVectorType) {
+tubeVectorStock.erase(child0->text);
+}
+}
+stock[child0->text] = TubeType;
+tubeStock[child0->text] = t;
+/*CHI:*/
+cout << "   TB->" << child0->text << endl;
+/*ENDCHI*/
+
+    return true;
+}
+else if(child(a, 1)->kind == "id") {
+/*CHI:*/
+cout << " Id" << endl;
+/*ENDCHI*/
+// Iterator to the id on stock map
+map<string,string>::iterator stockIt = stock.find(child(a, 1)->text);
+// If ID doesn't exists, throw an excpeption.
+if(stockIt == stock.end()) {
+/*CHI:*/
+cout << "ERR: ID " << child(a, 1)->text << " NOT FOUND." << endl;
+/*ENDCHI*/
+throw NoIdException(child(a, 1)->text);
+}
+
+    // Erase objects of IDs if replaced.
+// Iterator to the id on stock map.
+stockIt = stock.find(child0->text);
+// If ID already exists, erase the object!
+if(stockIt != stock.end()) {
+if(stock[child0->text] == TubeType) {
+tubeStock.erase(child0->text);
+}
+else if(stock[child0->text] == ConnectorType) {
+connectorStock.erase(child0->text);
+}
+else if(stock[child0->text] == TubeVectorType) {
+tubeVectorStock.erase(child0->text);
+}
+}
+
+    stock[child0->text] = stock[child(a, 1)->text];
+if(stock[child0->text] == TubeType) {
+tubeStock[child0->text] = tubeStock[child(a, 1)->text];
+/*CHI:*/
+cout << "   TB->" << child0->text << endl;
+/*ENDCHI*/
+}
+else if(stock[child0->text] == ConnectorType) {
+connectorStock[child0->text] = connectorStock[child(a, 1)->text];
+/*CHI:*/
+cout << "   CON->" << child0->text << endl;
+/*ENDCHI*/
+}
+else if(stock[child0->text] == TubeVectorType) {
+tubeVectorStock[child0->text] = tubeVectorStock[child(a, 1)->text];
+/*CHI:*/
+cout << "   TVEC->" << child0->text << endl;
+/*ENDCHI*/
+}
+
+    return true;
+}
 
   return false;
 }
@@ -513,9 +887,10 @@ cout << "Assign" << endl;
 * @return Boolean true if everything OK, false if something have gone wrong.
 */
 bool evaluateInstructionExpression(AST *a){
+//TODO: WHILE, PUSH, POP
 if(a->text == "WHILE") {
 /*CHI:*/
-cout << "while" << endl;
+cout << " while" << endl;
 /*ENDCHI*/
 //TODO: bucle (acabar primer exp. booleanes, o podran so)
 if(evaluateBooleanExpression(child(a, 0))) {
@@ -528,16 +903,162 @@ else {
 cout << "Condition false" << endl;
 /*ENDCHI*/      
 }
+
+    return true;
 }
 else if(a->text == "PUSH") {
 /*CHI:*/
-cout << "push" << endl;
+cout << " push" << endl;
 /*ENDCHI*/
+AST *child0 = child(a, 0);
+// If it is not an id, throw exception.
+if(child0->kind != "id") {
+/*CHI:*/
+cout << "ERR: " << child0->text << " IS NOT A VALID ID." << endl;
+/*ENDCHI*/
+throw WrongTypeException(child0->text, "VALID ID");
+}
+// Iterator to the child0->text on stock map
+map<string,string>::iterator stockIt = stock.find(child0->text);
+// If ID doesn't exists, throw an excpeption.
+if(stockIt == stock.end()) {
+/*CHI:*/
+cout << "ERR: ID " << child0->text << " NOT FOUND." << endl;
+/*ENDCHI*/
+throw NoIdException(child0->text);
+}
+// If it is not a tube vector throw an exception.
+if(stockIt->second != TubeVectorType) {
+/*CHI:*/
+cout << "ERR: " << child0->text << " IS NOT A TUBE VECTOR." << endl;
+/*ENDCHI*/
+throw WrongTypeException(child0->text, "TUBE VECTOR");
+}
+/*CHI:*/
+cout << "   B-TVEC " << child0->text << " SIZE " << tubeVectorStock[child0->text].tubes.size() << " TOP " << tubeVectorStock[child0->text].top << endl;
+/*ENDCHI*/
+
+    AST *child1 = child(a, 1);
+// If it is not an id, throw exception.
+if(child1->kind != "id") {
+/*CHI:*/
+cout << "ERR: " << child1->text << " IS NOT A VALID ID." << endl;
+/*ENDCHI*/
+throw WrongTypeException(child1->text, "VALID ID");
+}
+// Iterator to the child1->text on stock map
+stockIt = stock.find(child1->text);
+// If ID doesn't exists, throw an excpeption.
+if(stockIt == stock.end()) {
+/*CHI:*/
+cout << "ERR: ID " << child1->text << " NOT FOUND." << endl;
+/*ENDCHI*/
+throw NoIdException(child1->text);
+}
+// If it is not a tube throw an exception.
+if(stockIt->second != TubeType) {
+/*CHI:*/
+cout << "ERR: " << child1->text << " IS NOT A TUBE." << endl;
+/*ENDCHI*/
+throw WrongTypeException(child1->text, "TUBE");
+}
+
+    TubeVector tv = tubeVectorStock[child0->text];
+if(tv.top >= tv.tubes.size()) {
+/*CHI:*/
+cout << "ERR: index " << tv.top << " SIZE " << tv.tubes.size() << "." << endl;
+/*ENDCHI*/
+throw IndexOutOfBoundsException(tv.top, tv.tubes.size());
+}
+Tube t = tubeStock[child1->text];
+(tv.tubes)[tv.top] = t;
+++(tv.top);
+tubeVectorStock[child0->text] = tv;
+// Erase the tube put on the vector.
+stock.erase(child1->text);
+tubeStock.erase(child1->text);
+/*CHI:*/
+cout << "   A-TVEC " << child0->text << " SIZE " << tubeVectorStock[child0->text].tubes.size() << " TOP " << tubeVectorStock[child0->text].top << endl;
+/*ENDCHI*/
+
+    return true;
 }
 else if(a->text == "POP") {
 /*CHI:*/
-cout << "pop" << endl;
+cout << " pop" << endl;
 /*ENDCHI*/
+
+    AST *child0 = child(a, 0);
+// If it is not an id, throw exception.
+if(child0->kind != "id") {
+/*CHI:*/
+cout << "ERR: " << child0->text << " IS NOT A VALID ID." << endl;
+/*ENDCHI*/
+throw WrongTypeException(child0->text, "VALID ID");
+}
+// Iterator to the child0->text on stock map
+map<string,string>::iterator stockIt = stock.find(child0->text);
+// If ID doesn't exists, throw an excpeption.
+if(stockIt == stock.end()) {
+/*CHI:*/
+cout << "ERR: ID " << child0->text << " NOT FOUND." << endl;
+/*ENDCHI*/
+throw NoIdException(child0->text);
+}
+// If it is not a tube vector throw an exception.
+if(stockIt->second != TubeVectorType) {
+/*CHI:*/
+cout << "ERR: " << child0->text << " IS NOT A TUBE VECTOR." << endl;
+/*ENDCHI*/
+throw WrongTypeException(child0->text, "TUBE VECTOR");
+}
+/*CHI:*/
+cout << "   B-TVEC " << child0->text << " SIZE " << tubeVectorStock[child0->text].tubes.size() << " TOP " << tubeVectorStock[child0->text].top << endl;
+/*ENDCHI*/
+
+    AST *child1 = child(a, 1);
+// If it is not an id, throw exception.
+if(child1->kind != "id") {
+/*CHI:*/
+cout << "ERR: " << child1->text << " IS NOT A VALID ID." << endl;
+/*ENDCHI*/
+throw WrongTypeException(child1->text, "VALID ID");
+}
+
+    TubeVector tv = tubeVectorStock[child0->text];
+// If the vector is empty.
+if(tv.top <= 0) {
+/*CHI:*/
+cout << "ERR: index " << (tv.top - 1) << " SIZE " << tv.tubes.size() << "." << endl;
+/*ENDCHI*/
+throw IndexOutOfBoundsException(tv.top, tv.tubes.size());
+}
+
+    // Erase objects of IDs if already exists.
+// Iterator to the id on stock map.
+stockIt = stock.find(child1->text);
+// If ID already exists (and it's not a Tube), erase the object!
+if(stockIt != stock.end()) {
+if(stock[child1->text] == ConnectorType) {
+connectorStock.erase(child1->text);
+}
+else if(stock[child1->text] == TubeVectorType) {
+tubeVectorStock.erase(child1->text);
+}
+}
+
+    --(tv.top);
+Tube t = tv.tubes[tv.top];
+
+    stock[child1->text] = TubeType;
+tubeStock[child1->text] = t;
+tubeVectorStock[child0->text] = tv;
+
+    /*CHI:*/
+cout << "   A-TVEC " << child0->text << " SIZE " << tubeVectorStock[child0->text].tubes.size() << " TOP " << tubeVectorStock[child0->text].top << endl;
+/*ENDCHI*/
+
+    return true;
 }
 
   return false;
@@ -567,15 +1088,23 @@ else if(chKind == "instruction"){
 evaluateInstructionExpression(child(a, inst));
 }
 } catch(NoIdException& nie) {
-cerr << nie.what() << endl;
+cout << nie.what() << endl;
 } catch(WrongTypeException& wte) {
-cerr << wte.what() << endl;
-} catch(...) { // It catches any non handled exception.
-cerr << "Unhandled exception occurred." << endl;
+cout << wte.what() << endl;
+} catch(IndexOutOfBoundsException& ioobe) {
+cout << ioobe.what() << endl;
+} catch(WrongNumberException& wse){
+cout << wse.what() << endl;
+} 
+/*UEXCEPT:
+catch(...) { // It catches any non handled exception.
+cout << "Unhandled exception occurred." << endl;
 }
+/*UEXCEPTEND;*/
 ++inst;
 }
 }
+
 
 int main() {
 AST *root = NULL;

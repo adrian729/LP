@@ -1,0 +1,146 @@
+ list
+  \__assignation(=)
+  |              \__id(T1)
+  |              \__tube(TUBE)
+  |                         \__number(7)
+  |                         \__number(4)
+  \__assignation(=)
+  |              \__id(T2)
+  |              \__tube(TUBE)
+  |                         \__number(10)
+  |                         \__number(4)
+  \__assignation(=)
+  |              \__id(T3)
+  |              \__tube(TUBE)
+  |                         \__number(5)
+  |                         \__number(8)
+  \__assignation(=)
+  |              \__id(T4)
+  |              \__tube(TUBE)
+  |                         \__number(3)
+  |                         \__number(3)
+  \__assignation(=)
+  |              \__id(V)
+  |              \__tubeVector(TUBEVECTOR)
+  |                                     \__number(3)
+  \__instruction(PUSH)
+  |                 \__id(V)
+  |                 \__id(T1)
+  \__number(LENGTH)
+  |              \__id(T1)
+  \__instruction(PUSH)
+  |                 \__id(V)
+  |                 \__id(T2)
+  \__number(LENGTH)
+  |              \__id(T4)
+  \__instruction(PUSH)
+  |                 \__id(V)
+  |                 \__id(T4)
+  \__number(LENGTH)
+  |              \__id(T4)
+  \__instruction(POP)
+  |                \__id(V)
+  |                \__id(T4)
+  \__number(LENGTH)
+                 \__id(T4)
+
+ list
+  \__=
+  |   \__T1
+  |   \__TUBE
+  |          \__7
+  |          \__4
+  \__=
+  |   \__T2
+  |   \__TUBE
+  |          \__10
+  |          \__4
+  \__=
+  |   \__T3
+  |   \__TUBE
+  |          \__5
+  |          \__8
+  \__=
+  |   \__T4
+  |   \__TUBE
+  |          \__3
+  |          \__3
+  \__=
+  |   \__V
+  |   \__TUBEVECTOR
+  |                \__3
+  \__PUSH
+  |      \__V
+  |      \__T1
+  \__LENGTH
+  |        \__T1
+  \__PUSH
+  |      \__V
+  |      \__T2
+  \__LENGTH
+  |        \__T4
+  \__PUSH
+  |      \__V
+  |      \__T4
+  \__LENGTH
+  |        \__T4
+  \__POP
+  |     \__V
+  |     \__T4
+  \__LENGTH
+           \__T4
+assignation =
+ Assign
+ Tube
+   tube
+   TB->T1
+assignation =
+ Assign
+ Tube
+   tube
+   TB->T2
+assignation =
+ Assign
+ Tube
+   tube
+   TB->T3
+assignation =
+ Assign
+ Tube
+   tube
+   TB->T4
+assignation =
+ Assign
+ TubeVector
+ Size 3
+   TVEC->V
+instruction PUSH
+ push
+   B-TVEC V SIZE 3 TOP 0
+   A-TVEC V SIZE 3 TOP 1
+number LENGTH
+   id->tube T1
+ERR: ID T1 NOT FOUND.
+WRONG (SEMANTICALLY): T1 DOES NOT EXIST.
+instruction PUSH
+ push
+   B-TVEC V SIZE 3 TOP 1
+   A-TVEC V SIZE 3 TOP 2
+number LENGTH
+   id->tube T4
+3
+instruction PUSH
+ push
+   B-TVEC V SIZE 3 TOP 2
+   A-TVEC V SIZE 3 TOP 3
+number LENGTH
+   id->tube T4
+ERR: ID T4 NOT FOUND.
+WRONG (SEMANTICALLY): T4 DOES NOT EXIST.
+instruction POP
+ pop
+   B-TVEC V SIZE 3 TOP 3
+   A-TVEC V SIZE 3 TOP 2
+number LENGTH
+   id->tube T4
+3

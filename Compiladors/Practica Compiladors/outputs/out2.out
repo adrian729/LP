@@ -1,0 +1,432 @@
+ list
+  \__assignation(=)
+  |              \__id(T1)
+  |              \__tube(TUBE)
+  |                         \__number(7)
+  |                         \__number(4)
+  \__assignation(=)
+  |              \__id(T2)
+  |              \__tube(TUBE)
+  |                         \__number(10)
+  |                         \__number(4)
+  \__assignation(=)
+  |              \__id(T3)
+  |              \__id(T4)
+  |              \__split(SPLIT)
+  \__assignation(=)
+  |              \__id(T6)
+  |              \__tube(TUBE)
+  |                         \__number(6)
+  |                         \__number(2)
+  \__assignation(=)
+  |              \__id(TCOP)
+  |              \__id(T6)
+  \__assignation(=)
+  |              \__id(C1)
+  |              \__connector(CONNECTOR)
+  |                                   \__number(4)
+  \__assignation(=)
+  |              \__id(T5)
+  |              \__tube(MERGE)
+  |                          \__id(T3)
+  |                          \__id(C1)
+  |                          \__id(TCOP)
+  \__assignation(=)
+  |              \__id(T5)
+  |              \__tube(MERGE)
+  |                          \__id(T2)
+  |                          \__id(C1)
+  |                          \__id(TCOP)
+  \__assignation(=)
+  |              \__id(T5)
+  |              \__tube(MERGE)
+  |                          \__id(T1)
+  |                          \__id(C1)
+  |                          \__id(T3)
+  \__assignation(=)
+  |              \__id(TN)
+  |              \__tube(TUBE)
+  |                         \__number(5)
+  |                         \__number(4)
+  \__number(LENGTH)
+  |              \__id(T4)
+  \__number(DIAMETER)
+  |                \__id(T5)
+  \__assignation(=)
+  |              \__id(T7)
+  |              \__id(T8)
+  |              \__split(SPLIT)
+  |                           \__id(T5)
+  \__assignation(=)
+  |              \__id(C2)
+  |              \__connector(CONNECTOR)
+  |                                   \__number(4)
+  \__assignation(=)
+  |              \__id(C3)
+  |              \__connector(CONNECTOR)
+  |                                   \__number(4)
+  \__assignation(=)
+  |              \__id(T9)
+  |              \__tube(TUBE)
+  |                         \__number(LENGTH)
+  |                         |              \__id(T7)
+  |                         \__number(DIAMETER)
+  |                                          \__id(T8)
+  \__assignation(=)
+  |              \__id(T10)
+  |              \__tube(MERGE)
+  |                          \__tube(MERGE)
+  |                          |           \__id(T7)
+  |                          |           \__id(C2)
+  |                          |           \__id(T8)
+  |                          \__id(C3)
+  |                          \__id(TN)
+  \__assignation(=)
+  |              \__id(T1)
+  |              \__id(T2)
+  |              \__split(SPLIT)
+  |                           \__id(T10)
+  \__assignation(=)
+  |              \__id(C4)
+  |              \__connector(CONNECTOR)
+  |                                   \__number(DIAMETER)
+  |                                                    \__id(T1)
+  \__assignation(=)
+  |              \__id(C5)
+  |              \__connector(CONNECTOR)
+  |                                   \__number(4)
+  \__assignation(=)
+  |              \__id(T11)
+  |              \__tube(MERGE)
+  |                          \__id(T1)
+  |                          \__id(C4)
+  |                          \__tube(MERGE)
+  |                                      \__id(T4)
+  |                                      \__id(C5)
+  |                                      \__id(T2)
+  \__assignation(=)
+  |              \__id(V)
+  |              \__tubeVector(TUBEVECTOR)
+  |                                     \__number(5)
+  \__instruction(WHILE)
+  |                  \__boolean(AND)
+  |                  |            \__boolean(NOT)
+  |                  |            |            \__boolean(FULL)
+  |                  |            |                          \__id(V)
+  |                  |            \__boolean(OR)
+  |                  |                        \__boolean(AND)
+  |                  |                        |            \__boolean(>)
+  |                  |                        |            |          \__number(LENGTH)
+  |                  |                        |            |          |              \__id(T11)
+  |                  |                        |            |          \__number(3)
+  |                  |                        |            \__boolean(<)
+  |                  |                        |                       \__number(LENGTH)
+  |                  |                        |                       |              \__id(T11)
+  |                  |                        |                       \__number(30)
+  |                  |                        \__boolean(==)
+  |                  |                                    \__number(LENGTH)
+  |                  |                                    |              \__id(T11)
+  |                  |                                    \__number(0)
+  |                  \__list
+  |                         \__assignation(=)
+  |                         |              \__id(X)
+  |                         |              \__id(Y)
+  |                         |              \__split(SPLIT)
+  |                         |                           \__id(T11)
+  |                         \__instruction(PUSH)
+  |                         |                 \__id(V)
+  |                         |                 \__id(X)
+  |                         \__assignation(=)
+  |                                        \__id(T11)
+  |                                        \__id(Y)
+  \__assignation(=)
+  |              \__id(FT)
+  |              \__tube(TUBE)
+  |                         \__number(0)
+  |                         \__number(DIAMETER)
+  |                                          \__id(T11)
+  \__instruction(WHILE)
+                     \__boolean(AND)
+                     |            \__boolean(NOT)
+                     |            |            \__boolean(EMPTY)
+                     |            |                           \__id(V)
+                     |            \__boolean(<)
+                     |                       \__number(LENGTH)
+                     |                       |              \__id(FT)
+                     |                       \__number(8)
+                     \__list
+                            \__instruction(POP)
+                            |                \__id(V)
+                            |                \__id(TAUX)
+                            \__assignation(=)
+                            |              \__id(CX)
+                            |              \__connector(CONNECTOR)
+                            |                                   \__number(DIAMETER)
+                            |                                                    \__id(T11)
+                            \__assignation(=)
+                                           \__id(FT)
+                                           \__tube(MERGE)
+                                                       \__id(FT)
+                                                       \__id(CX)
+                                                       \__id(TAUX)
+
+ list
+  \__=
+  |   \__T1
+  |   \__TUBE
+  |          \__7
+  |          \__4
+  \__=
+  |   \__T2
+  |   \__TUBE
+  |          \__10
+  |          \__4
+  \__=
+  |   \__T3
+  |   \__T4
+  |   \__SPLIT
+  \__=
+  |   \__T6
+  |   \__TUBE
+  |          \__6
+  |          \__2
+  \__=
+  |   \__TCOP
+  |   \__T6
+  \__=
+  |   \__C1
+  |   \__CONNECTOR
+  |               \__4
+  \__=
+  |   \__T5
+  |   \__MERGE
+  |           \__T3
+  |           \__C1
+  |           \__TCOP
+  \__=
+  |   \__T5
+  |   \__MERGE
+  |           \__T2
+  |           \__C1
+  |           \__TCOP
+  \__=
+  |   \__T5
+  |   \__MERGE
+  |           \__T1
+  |           \__C1
+  |           \__T3
+  \__=
+  |   \__TN
+  |   \__TUBE
+  |          \__5
+  |          \__4
+  \__LENGTH
+  |        \__T4
+  \__DIAMETER
+  |          \__T5
+  \__=
+  |   \__T7
+  |   \__T8
+  |   \__SPLIT
+  |           \__T5
+  \__=
+  |   \__C2
+  |   \__CONNECTOR
+  |               \__4
+  \__=
+  |   \__C3
+  |   \__CONNECTOR
+  |               \__4
+  \__=
+  |   \__T9
+  |   \__TUBE
+  |          \__LENGTH
+  |          |        \__T7
+  |          \__DIAMETER
+  |                     \__T8
+  \__=
+  |   \__T10
+  |   \__MERGE
+  |           \__MERGE
+  |           |       \__T7
+  |           |       \__C2
+  |           |       \__T8
+  |           \__C3
+  |           \__TN
+  \__=
+  |   \__T1
+  |   \__T2
+  |   \__SPLIT
+  |           \__T10
+  \__=
+  |   \__C4
+  |   \__CONNECTOR
+  |               \__DIAMETER
+  |                          \__T1
+  \__=
+  |   \__C5
+  |   \__CONNECTOR
+  |               \__4
+  \__=
+  |   \__T11
+  |   \__MERGE
+  |           \__T1
+  |           \__C4
+  |           \__MERGE
+  |                   \__T4
+  |                   \__C5
+  |                   \__T2
+  \__=
+  |   \__V
+  |   \__TUBEVECTOR
+  |                \__5
+  \__WHILE
+  |       \__AND
+  |       |     \__NOT
+  |       |     |     \__FULL
+  |       |     |            \__V
+  |       |     \__OR
+  |       |          \__AND
+  |       |          |     \__>
+  |       |          |     |   \__LENGTH
+  |       |          |     |   |        \__T11
+  |       |          |     |   \__3
+  |       |          |     \__<
+  |       |          |         \__LENGTH
+  |       |          |         |        \__T11
+  |       |          |         \__30
+  |       |          \__==
+  |       |               \__LENGTH
+  |       |               |        \__T11
+  |       |               \__0
+  |       \__list
+  |              \__=
+  |              |   \__X
+  |              |   \__Y
+  |              |   \__SPLIT
+  |              |           \__T11
+  |              \__PUSH
+  |              |      \__V
+  |              |      \__X
+  |              \__=
+  |                  \__T11
+  |                  \__Y
+  \__=
+  |   \__FT
+  |   \__TUBE
+  |          \__0
+  |          \__DIAMETER
+  |                     \__T11
+  \__WHILE
+          \__AND
+          |     \__NOT
+          |     |     \__EMPTY
+          |     |             \__V
+          |     \__<
+          |         \__LENGTH
+          |         |        \__FT
+          |         \__8
+          \__list
+                 \__POP
+                 |     \__V
+                 |     \__TAUX
+                 \__=
+                 |   \__CX
+                 |   \__CONNECTOR
+                 |               \__DIAMETER
+                 |                          \__T11
+                 \__=
+                     \__FT
+                     \__MERGE
+                             \__FT
+                             \__CX
+                             \__TAUX
+assignation =
+Assign
+Tube
+assignation =
+Assign
+Tube
+assignation =
+Assign
+Split
+assignation =
+Assign
+Tube
+assignation =
+Assign
+Id
+assignation =
+Assign
+Connector
+assignation =
+Assign
+Tube
+assignation =
+Assign
+Tube
+assignation =
+Assign
+Tube
+assignation =
+Assign
+Tube
+number LENGTH
+id->tube
+-1389376640
+number DIAMETER
+ERR: ID T5 NOT FOUND.
+WRONG (SEMANTICALLY): T5 DOES NOT EXIST.
+assignation =
+Assign
+Split
+assignation =
+Assign
+Connector
+assignation =
+Assign
+Connector
+assignation =
+Assign
+Tube
+assignation =
+Assign
+Tube
+assignation =
+Assign
+Split
+assignation =
+Assign
+Connector
+assignation =
+Assign
+Connector
+assignation =
+Assign
+Tube
+assignation =
+Assign
+TubeVector
+instruction WHILE
+while
+AND
+NOT
+full
+OR
+AND
+>
+id->tube
+ERR: ID T11 NOT FOUND.
+WRONG (SEMANTICALLY): T11 DOES NOT EXIST.
+assignation =
+Assign
+Tube
+instruction WHILE
+while
+AND
+NOT
+empty
+<
+id->tube
+ERR: ID FT NOT FOUND.
+WRONG (SEMANTICALLY): FT DOES NOT EXIST.
