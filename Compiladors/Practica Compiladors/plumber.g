@@ -280,6 +280,7 @@ bool evaluateBooleanExpression(AST*);
 pair<Tube, Tube> evaluateSplitExpression(string);
 bool evaluateAssignationExpression(AST*);
 bool evaluateInstructionExpression(AST*);
+void printStock();
 void executePlumber(AST*);
 
 /**Implementation**/
@@ -713,10 +714,25 @@ bool evaluateAssignationExpression(AST *a){
   else if(child(a, 1)->kind == "tube") {
 
   // TODO: MERGE!
+    if(child(a, 1)->text == "MERGE") {
+      // Clear merge stack
+      tmp_merge_stack.tube_ids = stack<string>();
+      tmp_merge_stack.connector_ids = stack<string>();
+    }
     Tube t = evaluateTubeExpression(child(a, 1));
     // If it was a merge, destroy the objects merged
     if(child(a, 1)->text == "MERGE") {
-
+      //Erase tubes and connectors
+      while(!tmp_merge_stack.tube_ids.empty()) {
+        string t_id = tmp_merge_stack.tube_ids.top();
+        tmp_merge_stack.tube_ids.pop();
+        tubeStock.erase(t_id);
+      }
+      while(!tmp_merge_stack.connector_ids.empty()) {
+        string c_id = tmp_merge_stack.connector_ids.top();
+        tmp_merge_stack.connector_ids.pop();
+        connectorStock.erase(c_id);
+      }
     }
 
     // Erase objects of IDs if replaced.
@@ -902,6 +918,10 @@ bool evaluateInstructionExpression(AST *a) {
 void executePlumber(AST *a) {
   int inst = 0;
   while(child(a, inst)) {
+    /*PRINTSTOCK:
+    cout << "Instruction: " << inst << endl;
+    printStock();
+    /*ENDPRINTSTOCK*/
     try {
       string chKind = child(a, inst)->kind;
       if(chKind == "number") {
@@ -920,6 +940,50 @@ void executePlumber(AST *a) {
   }
 }
 
+/**
+ * Prints the actual stock in the standard output.
+ */
+void printStock(){
+
+  cout << "-------------------------" << endl;
+  cout << ":---------STOCK---------:" << endl;
+  cout << "-------------------------" << endl;
+  cout << endl;
+
+  cout << ">><<>><<> TUBES <>><<>><<" << endl << endl;
+  for (map<string, Tube>::iterator it = tubeStock.begin(); it!=tubeStock.end(); ++it) {
+    // Example: T1 => length: 10 // diameter: 5
+    cout << it->first << " => length: " << (it->second).length;
+    cout << " // diameter: " << (it->second).diameter << endl;
+  }
+  cout << endl;
+
+  cout << ">>>>>> TUBEVECTORS <<<<<<" << endl << endl;
+  for (map<string, TubeVector>::iterator it = tubeVectorStock.begin(); it!=tubeVectorStock.end(); ++it) {
+    cout << "TUBE VECTOR: " << it->first << endl << endl;
+    for(int i = 0; i < (it->second).top; ++i) {
+      // Example: TUBE 3 => length: 10 // diameter: 5
+      cout << "TUBE " << i << " => length: " << (it->second).tubes[i].length;
+      cout << " // diameter: " << (it->second).tubes[i].diameter << endl;
+    }
+    cout << endl;
+  }
+
+  cout << ">----> CONNECTORS  <----<" << endl << endl;
+  for (map<string, Connector>::iterator it = connectorStock.begin(); it!=connectorStock.end(); ++it) {
+    // Example: C4 => diameter: 7
+    cout << it->first << " => diameter: " << (it->second).diameter << endl;
+  }
+  cout << endl;
+
+  cout << "------------------------" << endl;
+  cout << ":----------END---------:" << endl;
+  cout << "------------------------" << endl;
+  cout << endl;
+
+
+}
+
 
 int main() {
   AST *root = NULL;
@@ -929,6 +993,10 @@ int main() {
   cout << endl;
 
   executePlumber(root);
+
+  cout << endl << endl;
+  printStock();
+
 }
 
 >>
