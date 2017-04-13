@@ -1,0 +1,1178 @@
+ list
+  \__=
+  |   \__T1
+  |   \__TUBE
+  |          \__7
+  |          \__4
+  \__=
+  |   \__T2
+  |   \__TUBE
+  |          \__10
+  |          \__4
+  \__=
+  |   \__T3
+  |   \__T4
+  |   \__SPLIT
+  |           \__T2
+  \__=
+  |   \__T6
+  |   \__TUBE
+  |          \__6
+  |          \__2
+  \__=
+  |   \__TCOP
+  |   \__T6
+  \__=
+  |   \__C1
+  |   \__CONNECTOR
+  |               \__4
+  \__=
+  |   \__T5
+  |   \__MERGE
+  |           \__T3
+  |           \__C1
+  |           \__TCOP
+  \__=
+  |   \__T5
+  |   \__MERGE
+  |           \__T2
+  |           \__C1
+  |           \__TCOP
+  \__=
+  |   \__T5
+  |   \__MERGE
+  |           \__T1
+  |           \__C1
+  |           \__T3
+  \__=
+  |   \__TN
+  |   \__TUBE
+  |          \__5
+  |          \__4
+  \__LENGTH
+  |        \__T4
+  \__DIAMETER
+  |          \__T5
+  \__=
+  |   \__T7
+  |   \__T8
+  |   \__SPLIT
+  |           \__T5
+  \__=
+  |   \__C2
+  |   \__CONNECTOR
+  |               \__4
+  \__=
+  |   \__C3
+  |   \__CONNECTOR
+  |               \__4
+  \__=
+  |   \__T9
+  |   \__TUBE
+  |          \__LENGTH
+  |          |        \__T7
+  |          \__DIAMETER
+  |                     \__T8
+  \__=
+  |   \__T10
+  |   \__MERGE
+  |           \__MERGE
+  |           |       \__T7
+  |           |       \__C2
+  |           |       \__T8
+  |           \__C3
+  |           \__TN
+  \__=
+  |   \__T1
+  |   \__T2
+  |   \__SPLIT
+  |           \__T10
+  \__=
+  |   \__C4
+  |   \__CONNECTOR
+  |               \__DIAMETER
+  |                          \__T1
+  \__=
+  |   \__C5
+  |   \__CONNECTOR
+  |               \__4
+  \__=
+  |   \__T11
+  |   \__MERGE
+  |           \__T1
+  |           \__C4
+  |           \__MERGE
+  |                   \__T4
+  |                   \__C5
+  |                   \__T2
+  \__=
+  |   \__V
+  |   \__TUBEVECTOR
+  |                \__5
+  \__WHILE
+  |       \__AND
+  |       |     \__NOT
+  |       |     |     \__FULL
+  |       |     |            \__V
+  |       |     \__OR
+  |       |          \__AND
+  |       |          |     \__>
+  |       |          |     |   \__LENGTH
+  |       |          |     |   |        \__T11
+  |       |          |     |   \__3
+  |       |          |     \__<
+  |       |          |         \__LENGTH
+  |       |          |         |        \__T11
+  |       |          |         \__30
+  |       |          \__==
+  |       |               \__LENGTH
+  |       |               |        \__T11
+  |       |               \__0
+  |       \__list
+  |              \__=
+  |              |   \__X
+  |              |   \__Y
+  |              |   \__SPLIT
+  |              |           \__T11
+  |              \__PUSH
+  |              |      \__V
+  |              |      \__X
+  |              \__=
+  |                  \__T11
+  |                  \__Y
+  \__=
+  |   \__FT
+  |   \__TUBE
+  |          \__0
+  |          \__DIAMETER
+  |                     \__T11
+  \__WHILE
+          \__AND
+          |     \__NOT
+          |     |     \__EMPTY
+          |     |             \__V
+          |     \__<
+          |         \__LENGTH
+          |         |        \__FT
+          |         \__8
+          \__list
+                 \__POP
+                 |     \__V
+                 |     \__TAUX
+                 \__=
+                 |   \__CX
+                 |   \__CONNECTOR
+                 |               \__DIAMETER
+                 |                          \__T11
+                 \__=
+                     \__FT
+                     \__MERGE
+                             \__FT
+                             \__CX
+                             \__TAUX
+
+Instruction: 0
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+
+>>>>>> TUBEVECTORS <<<<<<
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 1
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T1 => length: 7 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 2
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T1 => length: 7 // diameter: 4
+T2 => length: 10 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 3
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T1 => length: 7 // diameter: 4
+T3 => length: 5 // diameter: 4
+T4 => length: 5 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 4
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T1 => length: 7 // diameter: 4
+T3 => length: 5 // diameter: 4
+T4 => length: 5 // diameter: 4
+T6 => length: 6 // diameter: 2
+
+>>>>>> TUBEVECTORS <<<<<<
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 5
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T1 => length: 7 // diameter: 4
+T3 => length: 5 // diameter: 4
+T4 => length: 5 // diameter: 4
+T6 => length: 6 // diameter: 2
+TCOP => length: 6 // diameter: 2
+
+>>>>>> TUBEVECTORS <<<<<<
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 6
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T1 => length: 7 // diameter: 4
+T3 => length: 5 // diameter: 4
+T4 => length: 5 // diameter: 4
+T6 => length: 6 // diameter: 2
+TCOP => length: 6 // diameter: 2
+
+>>>>>> TUBEVECTORS <<<<<<
+
+>----> CONNECTORS  <----<
+
+C1 => diameter: 4
+
+------------------------
+:----------END---------:
+------------------------
+
+WRONG (SEMANTICALLY): UNMATCH DIAMETER BETWEEN C1 AND TCOP.
+Instruction: 7
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T1 => length: 7 // diameter: 4
+T3 => length: 5 // diameter: 4
+T4 => length: 5 // diameter: 4
+T6 => length: 6 // diameter: 2
+TCOP => length: 6 // diameter: 2
+
+>>>>>> TUBEVECTORS <<<<<<
+
+>----> CONNECTORS  <----<
+
+C1 => diameter: 4
+
+------------------------
+:----------END---------:
+------------------------
+
+WRONG (SEMANTICALLY): T2 DOES NOT EXIST.
+Instruction: 8
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T1 => length: 7 // diameter: 4
+T3 => length: 5 // diameter: 4
+T4 => length: 5 // diameter: 4
+T6 => length: 6 // diameter: 2
+TCOP => length: 6 // diameter: 2
+
+>>>>>> TUBEVECTORS <<<<<<
+
+>----> CONNECTORS  <----<
+
+C1 => diameter: 4
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 9
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T4 => length: 5 // diameter: 4
+T5 => length: 12 // diameter: 4
+T6 => length: 6 // diameter: 2
+TCOP => length: 6 // diameter: 2
+
+>>>>>> TUBEVECTORS <<<<<<
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 10
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T4 => length: 5 // diameter: 4
+T5 => length: 12 // diameter: 4
+T6 => length: 6 // diameter: 2
+TCOP => length: 6 // diameter: 2
+TN => length: 5 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+5
+Instruction: 11
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T4 => length: 5 // diameter: 4
+T5 => length: 12 // diameter: 4
+T6 => length: 6 // diameter: 2
+TCOP => length: 6 // diameter: 2
+TN => length: 5 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+4
+Instruction: 12 <------split
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T4 => length: 5 // diameter: 4
+T5 => length: 12 // diameter: 4
+T6 => length: 6 // diameter: 2
+TCOP => length: 6 // diameter: 2
+TN => length: 5 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 13
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T4 => length: 5 // diameter: 4
+T6 => length: 6 // diameter: 2
+T7 => length: 6 // diameter: 4
+T8 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+TN => length: 5 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 14
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T4 => length: 5 // diameter: 4
+T6 => length: 6 // diameter: 2
+T7 => length: 6 // diameter: 4
+T8 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+TN => length: 5 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+>----> CONNECTORS  <----<
+
+C2 => diameter: 4
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 15
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T4 => length: 5 // diameter: 4
+T6 => length: 6 // diameter: 2
+T7 => length: 6 // diameter: 4
+T8 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+TN => length: 5 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+>----> CONNECTORS  <----<
+
+C2 => diameter: 4
+C3 => diameter: 4
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 16
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T4 => length: 5 // diameter: 4
+T6 => length: 6 // diameter: 2
+T7 => length: 6 // diameter: 4
+T8 => length: 6 // diameter: 4
+T9 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+TN => length: 5 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+>----> CONNECTORS  <----<
+
+C2 => diameter: 4
+C3 => diameter: 4
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 17
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T10 => length: 17 // diameter: 4
+T4 => length: 5 // diameter: 4
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+
+>>>>>> TUBEVECTORS <<<<<<
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 18
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T1 => length: 8 // diameter: 4
+T2 => length: 9 // diameter: 4
+T4 => length: 5 // diameter: 4
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+
+>>>>>> TUBEVECTORS <<<<<<
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 19
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T1 => length: 8 // diameter: 4
+T2 => length: 9 // diameter: 4
+T4 => length: 5 // diameter: 4
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+
+>>>>>> TUBEVECTORS <<<<<<
+
+>----> CONNECTORS  <----<
+
+C4 => diameter: 4
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 20
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T1 => length: 8 // diameter: 4
+T2 => length: 9 // diameter: 4
+T4 => length: 5 // diameter: 4
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+
+>>>>>> TUBEVECTORS <<<<<<
+
+>----> CONNECTORS  <----<
+
+C4 => diameter: 4
+C5 => diameter: 4
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 21
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T11 => length: 22 // diameter: 4
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+
+>>>>>> TUBEVECTORS <<<<<<
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 22 <--- TUBEVEC
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T11 => length: 22 // diameter: 4
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+
+>>>>>> TUBEVECTORS <<<<<<
+
+TUBE VECTOR: V
+
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 0
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T11 => length: 22 // diameter: 4
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+
+>>>>>> TUBEVECTORS <<<<<<
+
+TUBE VECTOR: V
+
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 1
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+X => length: 11 // diameter: 4
+Y => length: 11 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+TUBE VECTOR: V
+
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 2
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+Y => length: 11 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+TUBE VECTOR: V
+
+TUBE 0 => length: 11 // diameter: 4
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 0
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T11 => length: 11 // diameter: 4
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+Y => length: 11 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+TUBE VECTOR: V
+
+TUBE 0 => length: 11 // diameter: 4
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 1
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+X => length: 5 // diameter: 4
+Y => length: 6 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+TUBE VECTOR: V
+
+TUBE 0 => length: 11 // diameter: 4
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 2
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+Y => length: 6 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+TUBE VECTOR: V
+
+TUBE 0 => length: 11 // diameter: 4
+TUBE 1 => length: 5 // diameter: 4
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 0
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T11 => length: 6 // diameter: 4
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+Y => length: 6 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+TUBE VECTOR: V
+
+TUBE 0 => length: 11 // diameter: 4
+TUBE 1 => length: 5 // diameter: 4
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 1
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+X => length: 3 // diameter: 4
+Y => length: 3 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+TUBE VECTOR: V
+
+TUBE 0 => length: 11 // diameter: 4
+TUBE 1 => length: 5 // diameter: 4
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 2
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+Y => length: 3 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+TUBE VECTOR: V
+
+TUBE 0 => length: 11 // diameter: 4
+TUBE 1 => length: 5 // diameter: 4
+TUBE 2 => length: 3 // diameter: 4
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 23
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+T11 => length: 3 // diameter: 4
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+Y => length: 3 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+TUBE VECTOR: V
+
+TUBE 0 => length: 11 // diameter: 4
+TUBE 1 => length: 5 // diameter: 4
+TUBE 2 => length: 3 // diameter: 4
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 24
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+FT => length: 0 // diameter: 4
+T11 => length: 3 // diameter: 4
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+Y => length: 3 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+TUBE VECTOR: V
+
+TUBE 0 => length: 11 // diameter: 4
+TUBE 1 => length: 5 // diameter: 4
+TUBE 2 => length: 3 // diameter: 4
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 0
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+FT => length: 0 // diameter: 4
+T11 => length: 3 // diameter: 4
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+Y => length: 3 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+TUBE VECTOR: V
+
+TUBE 0 => length: 11 // diameter: 4
+TUBE 1 => length: 5 // diameter: 4
+TUBE 2 => length: 3 // diameter: 4
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 1
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+FT => length: 0 // diameter: 4
+T11 => length: 3 // diameter: 4
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TAUX => length: 3 // diameter: 4
+TCOP => length: 6 // diameter: 2
+Y => length: 3 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+TUBE VECTOR: V
+
+TUBE 0 => length: 11 // diameter: 4
+TUBE 1 => length: 5 // diameter: 4
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 2
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+FT => length: 0 // diameter: 4
+T11 => length: 3 // diameter: 4
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TAUX => length: 3 // diameter: 4
+TCOP => length: 6 // diameter: 2
+Y => length: 3 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+TUBE VECTOR: V
+
+TUBE 0 => length: 11 // diameter: 4
+TUBE 1 => length: 5 // diameter: 4
+
+>----> CONNECTORS  <----<
+
+CX => diameter: 4
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 0
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+FT => length: 3 // diameter: 4
+T11 => length: 3 // diameter: 4
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+Y => length: 3 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+TUBE VECTOR: V
+
+TUBE 0 => length: 11 // diameter: 4
+TUBE 1 => length: 5 // diameter: 4
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 1
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+FT => length: 3 // diameter: 4
+T11 => length: 3 // diameter: 4
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TAUX => length: 5 // diameter: 4
+TCOP => length: 6 // diameter: 2
+Y => length: 3 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+TUBE VECTOR: V
+
+TUBE 0 => length: 11 // diameter: 4
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+
+Instruction: 2
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+FT => length: 3 // diameter: 4
+T11 => length: 3 // diameter: 4
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TAUX => length: 5 // diameter: 4
+TCOP => length: 6 // diameter: 2
+Y => length: 3 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+TUBE VECTOR: V
+
+TUBE 0 => length: 11 // diameter: 4
+
+>----> CONNECTORS  <----<
+
+CX => diameter: 4
+
+------------------------
+:----------END---------:
+------------------------
+
+
+
+-------------------------
+:---------STOCK---------:
+-------------------------
+
+>><<>><<> TUBES <>><<>><<
+
+FT => length: 8 // diameter: 4
+T11 => length: 3 // diameter: 4
+T6 => length: 6 // diameter: 2
+T9 => length: 6 // diameter: 4
+TCOP => length: 6 // diameter: 2
+Y => length: 3 // diameter: 4
+
+>>>>>> TUBEVECTORS <<<<<<
+
+TUBE VECTOR: V
+
+TUBE 0 => length: 11 // diameter: 4
+
+>----> CONNECTORS  <----<
+
+
+------------------------
+:----------END---------:
+------------------------
+

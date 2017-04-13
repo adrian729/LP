@@ -93,30 +93,61 @@ void ASTPrint(AST *a)
 
 int main() {
   AST *root = NULL;
-  ANTLR(plumber(&root), stdin);
+  ANTLR(program(&root), stdin);
   ASTPrint(root);
 }
 >>
 
-/** LEXIC */
 #lexclass START
 
-// Keywords
-#token TUBE "TUBE"
-#token 
+#token GRID      "Grid"
+#token PLACE     "PLACE"
+#token AT        "AT"
+#token MOVE      "MOVE"
+#token DIRECTION "NORTH | SOUTH | EAST | WEST"
+#token FITS      "FITS"
+#token HEIGHT    "HEIGHT"
+#token WHILE     "WHILE"
+#token DEF       "DEF"
+#token ENDEF     "ENDEF"
+#token COMP      "[<>]"
+#token AND       "AND"
+#token ASSIG     "="  
+#token ID        "[A-Za-z_][A-Za-z0-9_]*"
+#token NUM       "[0-9]+"
 
-// Operations
-#token ASSIG "="
+#token SPACE "[\ \n\t]" << zzskip();>>
 
-// Atoms
-#token ID "[A-Za-z$\_][A-Za-z0-9$\_]*"
+program: (grid conj_insts conj_defs) <<#0=createASTlist(_sibling);>>;
 
-//WhiteSpace
-#token SPACE "[\ \n]" << zzskip();>>
+grid: GRID^ NUM NUM ;
+conj_insts: (instruction <<#0=createASTlist(_sibling);>>)*;
+conj_defs: (function_def <<#0=createASTlist(_sibling);>>)*;
 
 
-/** SYNTAX */
-plumber: (ops)* <<#0=createASTlist(_sibling);>>;
+function_def: DEF^ ID conj_insts ;
 
-ops: ID+; 
+
+instruction:
+  move_inst
+  | wLoop
+  | ID (ASSIG! PLACE^ pair_num_list AT! (pair_num_list | ID) | )
+  ;
+
+
+move_inst: MOVE^ ID DIRECTION NUM ;
+
+wLoop: WHILE^ "\("! boolAnd "\)"! "\["! conj_insts "\]"! ;
+
+
+pair_num_list: ("\("! NUM ","! NUM "\)"!) <<#0=createASTlist(_sibling);>>;
+
+
+boolAnd: boolExpr (AND^ boolExpr)* ;
+boolExpr: fitsExpr | numExpr (COMP^ numExpr)* ;
+numExpr: HEIGHT^ "\("! ID "\)"! | NUM ;
+fitsExpr: FITS^ "\("! ID ","! trio_num_list "\)"! ;
+
+trio_num_list: (NUM ","! NUM ","! NUM) <<#0=createASTlist(_sibling);>>;
+
 

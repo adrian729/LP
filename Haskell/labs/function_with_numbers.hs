@@ -29,5 +29,5 @@ quickFib = fst . fib2
 fib2 :: Integer -> (Integer, Integer)
 fib2 n
     | n == 0    = (0,1)
-    | otherwise = (f2, (f1+f2))
-        where (f1, f2) = fib2 (n-1)
+    | otherwise = let (f1, f2) = fib2 (n-1)
+                  in (f2, (f1+f2))

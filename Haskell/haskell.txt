@@ -1,0 +1,175 @@
+if-then-else:
+
+-> Funcio de 3 parametres, boolea i 2 expressions del mateix tipus.
+-> Retorna el resultat d'una de les dues expressions.
+
+prod n m =
+	if n == 0 then 0
+	else ( prod (n -1) m) + m
+----------------------------
+
+case:
+
+prod n m =
+	case n of
+	0 -> 0
+	n -> ( prod (n -1) m) + m
+----------------------------
+
+Guardes:
+
+-> Afegeixen condicions al patro d'entrada.
+
+prod n m
+	| n == 0    = 0
+	| otherwise = ( prod (n -1) m ) + m
+----------------------------
+
+Tipus basics: Bool, Char, Int, Integer, Float
+
+-Bool:
+True, False, &&, ||, not
+Exemple: 
+xOr :: Bool -> Bool -> Bool
+xOr x y = ( x || y ) && not ( x && y )
+
+-Char (entre cometes simples '')
+
+-Int:
++ , - , * , ^ (infix)
+div , mod , abs i negate (prefix)
+-> Acotats per 2147483647.
+-> Podem transformarlos a Float amb fromIntegral.
+-> Funcions de conversio (import Data.Char):
+	ord :: char -> Int
+	chr :: Int -> char
+
+-Integer:
+-> Com Int, pero amb precissio arbitraria.
+-> Podem transformarlos a Float amb fromIntegral.
+
+-Float:
+(a part de les operacions de Int)
+^ :: Float ->Int -> Float
+**:: Float ->Float -> Float
+-> Conversio: ceiling, floor i round -> :: Float -> Int
+
+-Double: per a tenir doble precisió.
+
+-Rational: (racionals) fraccions d'Integers amb precisió arbitrària.
+----------------------------
+
+Tipus estructurats:
+
+-Tupla:
+(camp1, ... , campn)
+-> Els camps son de tipus heterogenis.
+Exemples: (3, True, 2.0) o ((5,2), 'p')
+-> Les tuples de dos elements son "especials":
+	-> Acces als seus elements amb fst i snd (primer element i segon element)
+
+-Llistes:
+-> Tots els elements han de ser del mateix tipus.
+-> Llista buida []
+-> Afegir element: (cap:cua)
+-> Concatenacio: l1++l2
+Exemple: (2:(3:[]))++(1:[]) es [2,3,1]
+-> Acces: head, tail
+----------------------------
+
+Definicions locals: 
+-let:
+let v1 = E1 ; ... ; vn = En in E
+->És una expressió i té el tipus d'E.
+Exemples:
+prod n m =
+	if n == 0 then 0
+	else let x = div n 2 ; y = mod n 2
+		in if y == 0 then 2* ( prod x m)
+		   else ( prod (n -1) m) + m
+prod n m =
+	if n == 0 then 0
+	else let x = div n 2
+			 y = mod n 2
+		in if y == 0 then 2* ( prod x m)
+		   else ( prod (n -1) m) + m
+
+-where:
+-> El where permet definir constants o funcions locals.
+-> No es una expressio!
+-> Es possa al final per afegir les definicions que falten.
+where {Def1; ... ; Defn}
+Exemples:
+prod n m =
+	if n == 0 then 0
+	else if y == 0 then 2* ( prod x m)
+		 else ( prod (n -1) m) + m
+	where { x = div n 2;
+	 y = mod n 2}
+prod n m =
+	if n == 0 then 0
+	else if y == 0 then 2 * (prod x m)
+		 else (prod (n-1) m) + m
+	where x = div n 2
+		  y = mod n 2
+-> Es poden definir també funcions (locals) noves que s'han usat.
+-> Les variables locals a les guardes han de ser definides amb where.
+----------------------------
+
+Pattern matching:
+> expr1 matches expr2 si existeix una substitucio per les variables de expr1
+que la fan igual que expr2.
+-> Proba si hi ha algun "matching", el primer que troba l'aplica.
+Exemple:
+sumar [] = 0
+sumar (x:xs) = x+(sumar xs)
+-> Al segon predicat fara pattern matching (x:xs) en treura x i xs
+-> Per exemple, x:xs matches [ 2, 5, 8 ] , perque es 2:(5:(8:[])).
+   Substitució: x = 2; xs = [ 5, 8 ]
+-> Es semblant pero no igual a la unificacio (Prolog). La unificacio es "two-way"
+   mentre pattern matching es "one-way".
+   Exemple:
+   X = Y
+   X = 5
+   -> Amb unificacio tindrem Y = 5, amb pattern matching donara error ja que Y no
+   existeix en aquell moment, X en canvi no fallara (espera tenir pattern matching).
+-> Es pot usar en el case i where, per exemple:
+	sumar l = case l of
+				[] -> 0
+				(x:xs ) -> x +( sumar xs )
+	divisio n m
+		| n < m = (0 , n)
+		| otherwise = (q +1 , r )
+		where (q, r) = divisio (n-m) m
+----------------------------
+
+Ordre superior:
+
+-> Les funcions en Haskell son d'ordre superior (prenen una funcio com argument, retornen una funcio com a resultat).
+-> Les funcions en Haskell son objectes de primera classe.
+----------------------------
+
+Curryfication:
+
+curry :: ((a,b) -> c) -> a -> b -> c
+curry f x y = f ( x , y )
+-> Haskell usa funcions currificades.
+
+uncurry :: (a -> b -> c) -> (a,b) -> c
+uncurry f ( p , s ) = f p s
+-> En Haskell una funcio "uncurried" realment es una funcio amb un sol parametre, tipus tupla.
+----------------------------
+Flip:
+
+flip :: (a -> b -> c) -> b -> a -> c
+flip f y x = f x y
+----------------------------
+
+Composicio de funcions amb ".":
+f . g = \x -> f (g x)
+Exemple: dqsort = reverse . qsort
+
+Aplicar funcions (permet evitar possar parentessis) amb "$":
+f $ x = f x
+Exemple: reverse $ 3:xs
+----------------------------
