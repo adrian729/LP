@@ -26,14 +26,38 @@ factorials :: [Integer]
 factorials = scanl (*) 1 (iterate (+1) 1)
 
 --Generate the sequence of the Fibonacci numbers: [0,1,1,2,3,5,8,13,…].
---fibs :: [Integer]
+fibs :: [Integer]
+fibs = 0:1:fibs' 0 1
+
+fibs' :: Integer -> Integer -> [Integer]
+fibs' n1 n2 = n3 : fibs' n2 n3
+    where n3 = n1 + n2
 
 --Generate the sequence of prime numbers: [2,3,5,7,11,13,17,19,…].
---primes :: [Integer]
+primes :: [Integer]
+primes = primes' [] 2
+
+primes' :: [Integer] -> Integer -> [Integer]
+primes' l n
+    | primeNum l n = n : primes' (l ++ [n]) (n+1)
+    | otherwise    = primes' l (n+1)
+
+primeNum :: [Integer] -> Integer -> Bool
+primeNum l n = and $ map (\x -> mod n x /= 0) $ takeWhile (\x -> x*x <= n) $ l
+
+--primes = lprimes $ iterate (+1) 2
+--    where lprimes (x:xs) = x:(lprimes $ filter (\y -> (mod y x)/=0) xs)
 
 --Generate the ordered sequence of the Hamming numbers: [1,2,3,4,5,6,8,9,…].
 --The Hamming numbers are those that only have 2, 3 and 5 as prime divisors.
---hammings :: [Integer]
+hammings :: [Integer]
+hammings = 1 : map (2*) hammings `merge` map (3*) hammings `merge` map (5*) hammings
+
+merge :: [Integer] -> [Integer] -> [Integer]
+merge (x:xs) (y:ys)
+    | x < y = x : merge xs (y:ys)
+    | x > y = y : merge (x:xs) ys
+    | otherwise = x : merge xs ys
 
 --Generate the look-and-say sequence: [1,11,21,1211,111221,312211,13112221,1113213211,…].
 lookNsay :: [Integer]
@@ -58,4 +82,9 @@ splitTakeWhile s c n
 --Generate the sequences of rows of the Tartaglia triangle
 --(also known as Pascal’s triangle): [[1],[1,1],[1,2,1],[1,3,3,1],…].
 tartaglia :: [[Integer]]
-tartaglia = iterate () [1]
+tartaglia = iterate (\x -> 1 : pascal x) [1]
+
+pascal :: [Integer] -> [Integer]
+pascal (x:[]) = [x]
+pascal (x1:x2:sx) = x1 + x2 : pascal (x2:sx)
+
