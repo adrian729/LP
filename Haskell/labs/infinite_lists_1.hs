@@ -71,13 +71,16 @@ lns s
 
 lnsCall :: String -> Char -> String
 lnsCall s c = show n ++ [c] ++ (lns $ ts)
-    where (n, ts) = splitTakeWhile s c 0
+    where (hs, ts) = span (== c) s
+          n = length hs
+--lnsCall s c = show n ++ [c] ++ (lns $ ts)
+--    where (n, ts) = splitTakeWhile s c 0
 
-splitTakeWhile :: String -> Char -> Integer -> (Integer, String)
-splitTakeWhile s c n
-    | null s || (e /= c) = (n, s)
-    | otherwise = splitTakeWhile se c $ succ n
-    where (e:se) = s
+--splitTakeWhile :: String -> Char -> Integer -> (Integer, String)
+--splitTakeWhile s c n
+--    | null s || (e /= c) = (n, s)
+--    | otherwise = splitTakeWhile se c $ succ n
+--    where (e:se) = s
 
 --Generate the sequences of rows of the Tartaglia triangle
 --(also known as Pascal’s triangle): [[1],[1,1],[1,2,1],[1,3,3,1],…].

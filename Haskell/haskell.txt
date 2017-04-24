@@ -143,6 +143,18 @@ sumar (x:xs) = x+(sumar xs)
 		where (q, r) = divisio (n-m) m
 ----------------------------
 
+Polimorfisme parametric:
+-> Utilitzar variables de tipus que poden pendre qualsevol valor.
+-> Permet tenir definicions generiques.
+Exemple:
+map :: (a -> b) -> a -> b
+-> a i b poden ser de qualsevol tipus.
+
+-> Si no existeix substitucio possible per a les variables de tipus,
+donara error de tipus.
+Exemple: map not ['b', 'c'] donara error de tipus.
+----------------------------
+
 Ordre superior:
 
 -> Les funcions en Haskell son d'ordre superior (prenen una funcio com argument, retornen una funcio com a resultat).
@@ -173,3 +185,201 @@ Aplicar funcions (permet evitar possar parentessis) amb "$":
 f $ x = f x
 Exemple: reverse $ 3:xs
 ----------------------------
+
+Layziness:
+
+-> Haskell fa servir lazy evaluation: nomes avalua el que cal.
+-> Un valor encara no avaluat s'anomena "thunk".
+-> Podem avaluar una funcio amb "thunks" com a arguments.
+-> Permet tractar estructures molt grans o infinites.
+----------------------------
+
+Avaluacio eager (no lazy):
+
+$!
+-> Es pot forçar cert nivell d'avaluacio eager amb el prefix $!
+   Exemple: f $! x permet avaluar primer x i despres f x
+-> Nomes avalua fins que troba un constructor.
+   Exemple: take 5 $! repeat 1 tornara [1,1,1,1,1], no seguira fins
+            l'infinit, ja que avaluara la segona expressio nomes fins
+            que troba un constructor (en aquest cas, ":").
+
+$!!
+-> Força l'avaluacio completa (no fins al primer constructor).
+-> Pot ser perillos! (si tractem una llista infinita, no acabara mai).
+   Exemple: en take 5 $!! repeat 1, no acabara mai d'avaluar l'expressio
+            repeat 1.
+----------------------------
+
+Altres tipus predefinits:
+
+-Maybe: per manejar errors.
+-> Te dos constructors:
+	-> Just: te un parametre.
+	-> Nothing: no te parametres.
+-> Operacions:
+	-> isJust :: Maybe a -> Bool
+	-> isNothing :: Maybe a -> Bool
+	-> fromJust :: Maybe a -> a
+	-> fromMaybe :: a -> Maybe a -> a
+Exemple:
+mitjana :: [a] -> Maybe a
+mitjana [] = Nothing
+mitjana l = Just (sum l `div` length l)
+----------------------------
+
+
+
+
+
+
+----------------------------
+FUNCIONS
+----------------------------
+
+Funcions ordre superior predefinides amb llistes:
+
+map :: (a->b) -> [a] -> [b]
+-- aplica la funció a tots el elements de la llista
+
+--map (*2) [2,4,6,7]
+--[4,8,12,14]
+
+--map (even) [2,4,6,7]
+--[True,True,True,False]
+
+foldr :: (a -> b -> b) -> b -> [a] -> b
+--rec 
+--foldr f x [x1,....,xn] = -- (f x1 (f x2 ( .....(f xn (foldr f x []) )...))) 
+--foldr f x [] = x
+--foldr (+) 0 [3,2,(-1)]
+--4
+
+foldl::(b -> a -> b) -> b -> [a] -> b
+--iter // tail recursive definition
+--foldl f x [x1,....,xn] = foldl f (f ( ... (f x x1) ... ) xn) []
+--foldl f x [] = x
+--foldl (+) 0 [3,2,(-1)]
+--4
+
+scanr :: (a -> b -> b) -> b -> [a] -> [b]
+-- retorna la llista amb tots els valors intermedis calculats pel foldr
+--scanr (+) 0 [3,2,(-1)]
+--[4,1,-1,0]
+--Noteu que el foldr calcula amb el resultat crida recursiva.
+
+scanl::(b -> a -> b) -> b -> [a] -> [b]
+-- retorna retorna la llista amb tots els valors intermedis calculats pel foldrl
+--scanl (+) 0 [3,2,(-1)]
+--[0,3,5,4]
+--Noteu que el foldl acumula el càlcul en el pas de paràmetres a la crida recursiva.
+
+iterate :: (a -> a) -> a -> [a]
+-- iterate f x = ----[x, (f x), (f (f x)), (f (f (f x))), ....
+
+all::(a -> Bool) -> [a] -> Bool
+-- tots els elements de la llista satisfan la propietat.
+
+any::(a -> Bool) -> [a] -> Bool
+-- algun element de la llista satisfà la propietat.
+
+filter::(a -> Bool) -> [a] -> [a]
+-- selecciona els que satisfan la propietat
+
+dropWhile::(a -> Bool) -> [a] -> [a]
+-- elimina mentre es satisfà la propietat.
+--dropWhile  (even) [2,4,6,7]
+--[7]
+
+takeWhile::(a -> Bool) -> [a] -> [a]
+-- es queda els elements mentre es satisfà la propietat.
+--takeWhile  (even) [2,4,6,7]
+--[2,4,6]
+
+zipWith::(a -> b -> c) -> [a] -> [b] -> [c]
+-- Aplica la funció als elements dos a dos de les llistes donades i
+-- retorna la llista de resultats.
+
+span :: (a -> Bool) -> [a] -> ([a], [a])
+-- Applied to a predicate p and a list xs, returns a tuple where first
+-- element is longest prefix (possibly empty) of xs of elements that 
+-- satisfy p and second element is the remainder of the list.
+--span (< 3) [1,2,3,4,1,2,3,4] == ([1,2],[3,4,1,2,3,4])
+--span (< 9) [1,2,3] == ([1,2,3],[])
+--span (< 0) [1,2,3] == ([],[1,2,3])
+-- span p xs is equivalent to (takeWhile p xs, dropWhile p xs)
+
+concatMap :: Foldable t => (a -> [b]) -> t a -> [b]
+-- Creates a list from a list generating function by application of this
+-- function on all elements in a list passed as the second argument.
+--concatMap (show) [[1,2,3,4],[2],[]]
+--"[1,2,3,4][2][]"
+--concatMap (\x -> [(x,x+2,x/2)]) [1,3,5]
+--[(1.0,3.0,0.5),(3.0,5.0,1.5),(5.0,7.0,2.5)]
+----------------------------
+
+Altres funcions:
+
+concat :: Foldable t => t [a] -> [a]
+-- The concatenation of all the elements of a container of lists.
+--concat [[1,2,3,4],[2]]
+--[1,2,3,4,2]
+
+head :: [a] -> a
+-- Returns the first item of a list.
+
+tail :: [a] -> a
+-- Returns the last item of a list.
+
+init :: [a] -> [a]
+-- Returns the list without its last item.
+
+last :: [a] -> [a]
+-- Returns the list without its first item.
+
+reverse :: [a] -> [a]
+-- Returns the reverse of the list.
+
+length :: Foldable t => t a -> Int
+-- Returns the length of a list.
+
+(!!) :: [a] -> Int -> a
+-- Returns the item at the position indicated by the second argument.
+--[2,3,4] !! 1
+--3
+--[2,3,4] !! 3
+--*** Exception: Prelude.!!: index too large
+
+elem :: (Eq a, Foldable t) => a -> t a -> Bool
+-- Returns True if the list contains an item equal to the first argument.
+
+notElem :: (Eq a, Foldable t) => a -> t a -> Bool
+-- Returns True if the list does not contain an item equal to the first argument.
+
+maximum :: (Ord a, Foldable t) => t a -> a
+-- Returns the maximum element of the list.
+
+minimum :: (Ord a, Foldable t) => t a -> a
+-- Returns the minimum element of the list.
+
+and :: Foldable t => t Bool -> Bool
+-- Returns the and of the elements of the list.
+
+or :: Foldable t => t Bool -> Bool
+-- Returns the or of the elements of the list.
+
+sum :: (Num a, Foldable t) => t a -> a
+-- Returns the sum of the elements of the list.
+
+product :: (Num a, Foldable t) => t a -> a
+-- Returns the product of the elements of the list.
+
+take :: Int -> [a] -> [a]
+-- Returns the first X elements of the list (where X is the first argument).
+
+drop :: Int -> [a] -> [a]
+-- Returns the list withput its first X elements
+-- (where X is the first argument).
+
+splitAt :: Int -> [a] -> ([a], [a])
+-- Is equivalent to (take n xs, drop n xs)
