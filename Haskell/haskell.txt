@@ -228,6 +228,267 @@ mitjana [] = Nothing
 mitjana l = Just (sum l `div` length l)
 ----------------------------
 
+Creacio tipus de dades:
+-data:
+Exemple: data Color = Vermell | Blau | Verd | Groc
+
+-newtype:
+Exemple: 
+newtype Dolars = Dolars Int
+llistaDolars :: [Dolars]
+llistaDolars = [Dolars 3, Dolars 27]
+-> newtype es com data, pero amb un sol constructor de tipus.
+
+-> tot newtype es pot escriure com un data (no al contrari).
+Exemple: data Dolars = Dolars Int (sera equivalent al newtype d'abans).
+
+-> El tipus Maybe esta definit amb un data:
+data Maybe a = Just a | Nothing
+-> El tipus Either tambe:
+data Either a b = Left a | Right b
+----------------------------
+
+Creacio de tipus recursius:
+(Exemple)
+data ArbBin a = Node a (ArbBin a) (ArbBin a) | Abuit
+data ArbBin a = Node a (ArbBin a) (ArbBin a) | Fulla a
+data ArbBin a = Node a (ArbBin a) [ArbGen a] | Abuit
+-> Els constructors Node, Abuit i Fulla son operadors.
+----------------------------
+
+Tipus sinonims:
+type String = [Char]
+type Person = (Name, Address)
+type Name = String
+type AssocList a b  = [(a,b)]
+-> Son intercanviables.
+----------------------------
+
+Classes de tipus:
+-> Les classes en Haskell no son tipus, si no categories de tipus.
+-> Es un mecanisme similar a Interfaces Java.
+	-> Permet tenir sobrecarrega.
+	-> Es una altra forma de polimorfisme.
+
+Exemple:
+class Eq a where
+	(==) :: a -> a -> Bool
+
+elem :: (Eq a) => a -> [a] -> Bool
+
+Exemple:
+class Eq a where
+	(==), (/=)  :: a -> a -> Bool
+	x /= y      =  not (x == y)
+	x == y      =  not (x /= y)
+-> El minim que cal per completar la definicio es definir el
+== o definir el /= (nomes cal un dels dos).
+-> Si diem que un tipus pertany a una classe, cal completar la 
+definicio.
+
+Exemple:
+class (Eq a) => Ord a where
+	compare              :: a -> a -> Ordering
+	(<), (<=), (>=), (>) :: a -> a -> Bool
+	max, min             :: a -> a -> a
+
+	compare x y
+		| x == y    = EQ
+		| x <= y    = LT
+		| otherwise = GT
+	x <= y          = compare x y /= GT
+	x <  y          = compare x y == LT
+	x >= y          = compare x y /= LT
+	x >  y          = compare x y == GT
+
+data Ordering = LT | EQ | GT
+
+-> El minim que cal completar es definir el (<=) o el compare.
+
+-> Hi ha altres classes (Show, Read, Enum, Num)
+
+Instanciacio:
+Exemple:
+data ArbBin a = Node a (ArbBin a) (ArbBin a) | Abuit
+
+instance Eq a => Eq (ArbBin a) where
+	Abuit == Abuit                   = True
+	_     == Abuit                   = False
+	Abuit == _                       = False
+	(Node x a1 a2) == (Node y b1 b2) = x == y && a1 == b1 && a2 == b2
+
+Instanciacio predefinida (deriving):
+Exemple:
+data Color = Vermell | Blau | Verd | Groc
+	deriving (Read, Show, Enum, Eq, Ord)
+
+Exemple (Num):
+class (Eq a, Show a) => Num a where
+	(+), (-), (*) :: a -> a -> a
+	negate        :: a -> a
+	abs, signum   :: a -> a
+	fromInteger   :: Integer -> a
+
+	x - y         = x + negate y
+	negate x      = 0 - x
+-> Obliga els tipus de classe Num a ser tambe de Eq i Show.
+-> Per fer un instance cal definir tot menys negate o (-).
+
+Exemple:
+class Pred a where
+	sat   :: a -> Bool
+	unsat :: a -> Bool
+
+	unsat = not . sat
+
+instance Pred a => Pred (ArbBin a) where
+	sat Abuit        = True
+	sat (Node x b c) = (sat x) && (sat b) && (sat c)
+
+instance (Pred Int) where
+	sat 0 = True
+	sat _ = False
+----------------------------
+
+Monades:
+-> S'utilitzen en Haskell per modelar caracteristiques no gaire 
+funcionals (indeterminisme, excepcions, nocio d'estat, entrada/sortida...)
+
+-> Objectiu: encapsular un comput mitjançant un contenidor m.
+
+-> Definirem monades com a instancies de la classe Monad o Functor.
+-> No es poden derivar.
+
+-> Les monades es regeixen per tres regles (que hem de comprovar):
+	-> Identitat per l'esquerra: return a >>= f = f a
+	-> Identitat per la dreta: m >>= return = m
+	-> Associativitat: (m >>= f) >>= g = m >>= (\x -> f x >>= g)
+----------------------------
+
+Class Functor:
+
+class Functor f where
+	fmap :: (a -> b) -> f a -> f b
+
+-> Els tipus llista ([]) i Maybe son instancies de la classe Functor.
+
+instance Functor Maybe where
+	fmap g Nothing  = Nothing
+	fmap g (Just x) = Just (g x)
+
+instance Functor [] where
+	fmap = map
+
+-> La funcio fmap associada al Functor
+	-> Aplica la funcio a les dades d'un contenidor.
+	-> Pot canviar el tipus del contingut, pero no el contenidor.
+----------------------------
+
+Class Monad:
+
+class Monad m where
+	(>>=)  :: m a    -> (a -> m b) -> m b
+	(>>)   :: m a    -> m b        -> m b
+	return :: a
+	fail   :: String -> m a
+
+-> Nomes utilitzarem les definicions (>>=), return i (>>).
+	-> (>>=) representa la composicio de computs. Permet simular efectes
+	laterals. Se l'anomena operador bind.
+	L'unic que diferencia (>>=) del fmap es que retorna el contenidor amb
+	el contingut nou, no nomes el contingut.
+	-> (return x) representa un comput que produeix x mateix (x com a
+	comput).
+	-> (>>) r >> k = r >>= \_ -> k
+
+-> Els tipus llista ([]) i Maybe son instancies de la classe Monad.
+
+instance Monad Maybe where
+	(Just x) >>= k = k x
+	Nothing >>= k  = Nothing
+	return         = Just
+
+instance Monad [] where
+	m >>= k  = concat (map k m)
+	return x = [x]
+----------------------------
+Funcions:
+-> Moltes funcions predefinides tenen una extensio per a Monad.
+Exemple: mapM, foldM, filterM...
+
+-> Tambe operacions per extendre funcions i que treballin amb Monad.
+
+import Control.Monad
+
+liftM :: Monad m => (a -> b) -> m a -> m b
+liftM2 :: Monad m => (a -> b -> c) -> m a -> m b -> m c
+(liftM3, liftM4, etc)
+Exemple: 
+sumaMaybe :: Num a => Maybe a -> Maybe a -> Maybe a
+sumaMaybe = liftM2 (+)
+---------------------------
+
+Composicio de computs:
+
+-> (;) per concatenar computs.
+-> operador <- per guardar resultats intermedis.
+do { e1 ; e2 } = e1 >> e2
+do { p <- e1 ; e2} = e1 >>= \p -> e2
+-> Si usem identacio correcta i diferents linies, podem estalviar-nos el ;
+do p <- e1
+   e2
+----------------------------
+
+Monad IO:
+
+-> Usem el tipus IO per gestionar entrada/sortida.
+-> IO es una instancia de les classes Functor i Monad
+-> Normalment s'ussa amb notacio do.
+
+Operacions basiques:
+getChar  :: IO Char
+putChar  :: Char -> IO ()
+getLine  :: IO String
+putStr   :: String -> IO ()
+putStrLn :: String -> IO ()
+
+-> En Haskell () es el tipus "unit" i representa res (void en altres
+llenguatges).
+
+Exemple (implementacio de getLine):
+getLine = do c <- getChar
+             if c == '\n'
+             then return ""
+             else do l <- getLine
+                     return (c:l)
+
+-> El where pot donar problemes degut a la definicio de (>>=).
+-> Podem usar el let.
+Exemple:
+main = do
+       x <- getLine
+       let f = factorial (read x)::Integer
+       print f
+
+Exemple (Sense usar el let):
+main do
+     x <- getLine
+     f <- return (factorial ((read x)::Integer))
+     print f
+----------------------------
+Monad IO amb arxius o canals:
+
+type FilePath = String
+data IOMode = ReadMode | WriteMode | AppendMode | ReadWriteMode
+
+openFile :: FilePath -> IOMode -> IO Handle
+hClose :: Handle -> IO ()
+getContents :: Handle -> IO String
+
+-> Handle es el tipus de Haskell per arxius i canals.
+-> S'ha d'importar System.IO per usar-les.
+
+
 
 
 

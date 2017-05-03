@@ -1,0 +1,10 @@
+-- S'ha canviat al plumber.g la instruccio "conditional" per 
+"conditional2", ja que al compilar es queixa (potser es algo
+local del portatil personal).
+
+
+
+
+-> ARREGLAR:
+
+EXPRESSIONS, NO MIRA ELS PARENTESIS!!!!!!! (nExp i bExp)
