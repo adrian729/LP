@@ -9,8 +9,11 @@ import System.IO
 -------------------------------------
 -- P2
 -------------------------------------
+
+--identificadors
 type Ident = String
 
+--expressions booleanes
 data BExpr a =
     And (BExpr a) (BExpr a)
     | Or (BExpr a) (BExpr a)
@@ -22,6 +25,7 @@ data BExpr a =
     | Full Ident
     deriving (Read)
 
+--expressions numeriques
 data NExpr a =
     Var Ident
     | Const a
@@ -32,17 +36,20 @@ data NExpr a =
     | Diameter Ident
     deriving (Read)
 
+--expressions de conector
+data CExpr a =
+    CVar Ident
+    | Connector (NExpr a)
+    deriving (Read)
+
+--expressions de tub
 data TExpr a =
     TVar Ident
     | Merge (TExpr a) (CExpr a) (TExpr a)
     | Tube (NExpr a) (NExpr a)
     deriving (Read)
 
-data CExpr a =
-    CVar Ident
-    | Connector (NExpr a)
-    deriving (Read)
-
+--comandes/instruccions
 data Command a =
     Copy Ident Ident
     | TAssign Ident (TExpr a)
@@ -59,45 +66,17 @@ data Command a =
     | Split  Ident Ident Ident
     deriving (Read)
 
-
 -------------------------------------
--- P3
--------------------------------------
-data Val a =
-    NVal a
-    | TVal (a, a)
-    | CVal a
-    | VVal [a]
-    deriving (Eq, Ord)
-
-data Mem a =
-    MemVals [(String, Val a)]
-
-class SymTable m where
-    update :: m a -> String -> Val a -> m a
-    value  :: m a -> String -> Maybe (Val a)
-    start  :: m a
-
-instance SymTable Mem where
-   --TODO: implementar les funcions!!!
-   update (MemVals l) s v = (MemVals l)
-    
-
-
-
-
- -------------------------------------
- -------------------------------------   
+-------------------------------------   
 --Show Data
 -------------------------------------
 -------------------------------------
-
 
 -------------------------------------
 -- P2
 -------------------------------------
 instance (Show a) => Show (BExpr a) where
-    --Parentitzacio
+    --casos amb parentitzacio
     show (And (Or a b) (Or c d))  = "(" ++ show (Or a b) ++ ")" ++
                                     " AND " ++ "(" ++ show (Or c d) ++ ")"
     show (And (And a b) (Or c d)) = "(" ++ show (And a b) ++ ")" ++
@@ -112,15 +91,15 @@ instance (Show a) => Show (BExpr a) where
                                     " OR " ++ show bExp2
     show (Not (And a b))          = "NOT " ++ "(" ++ show (And a b) ++ ")"
     show (Not (Or a b))           = "NOT "++ "(" ++ show (Or a b) ++ ")"
-    --Fi parentitzacio
-    show (And bExp1 bExp2)         = show bExp1 ++ " AND " ++ show bExp2
-    show (Or bExp1 bExp2)          = show bExp1 ++ " OR " ++ show bExp2
-    show (Not bExp1)               = "NOT " ++ show bExp1
-    show (Gt nExp1 nExp2)          = show nExp1 ++ " > " ++ show nExp2
-    show (Lt nExp1 nExp2)          = show nExp1 ++ " < " ++ show nExp2
-    show (Eq nExp1 nExp2)          = show nExp1 ++ " = " ++ show nExp2
-    show (Empty id)                = "EMPTY(" ++ id ++ ")"
-    show (Full id)                 = "FULL(" ++ id ++ ")"
+    --casos sense parentitzacio
+    show (And bExp1 bExp2)        = show bExp1 ++ " AND " ++ show bExp2
+    show (Or bExp1 bExp2)         = show bExp1 ++ " OR " ++ show bExp2
+    show (Not bExp1)              = "NOT " ++ show bExp1
+    show (Gt nExp1 nExp2)         = show nExp1 ++ " > " ++ show nExp2
+    show (Lt nExp1 nExp2)         = show nExp1 ++ " < " ++ show nExp2
+    show (Eq nExp1 nExp2)         = show nExp1 ++ " = " ++ show nExp2
+    show (Empty id)               = "EMPTY(" ++ id ++ ")"
+    show (Full id)                = "FULL(" ++ id ++ ")"
 
 instance (Show a) => Show (NExpr a) where
     show (Var id)            = id
@@ -151,36 +130,144 @@ indentator n = replicate (n*2) ' '
 
 showCommand :: Show a => Int -> (Command a) -> String
 showCommand n (Copy id1 id2)           = indentator n ++
-                                         id1 ++ " = " ++ id2 ++ "\n"
+                                         id1 ++ " = " ++ id2
+
 showCommand n (TAssign id tExpr)       = indentator n ++
-                                         id ++ " = " ++ show tExpr ++ "\n"
+                                         id ++ " = " ++ show tExpr
+
 showCommand n (CAssign id tExpr)       = indentator n ++
-                                         id ++ " = " ++ show tExpr ++ "\n"
+                                         id ++ " = " ++ show tExpr
+
 showCommand n (Split id1 id2 id3)      = indentator n ++
                                          "(" ++ id1 ++ "," ++ id2 ++ ")" ++
-                                         " = SPLIT " ++ id3 ++ "\n"
+                                         " = SPLIT " ++ id3
+
 showCommand n (Input id)               = indentator n ++
-                                         "INPUT " ++ id ++ "\n"
+                                         "INPUT " ++ id
+
 showCommand n (Print nExpr)            = indentator n ++
-                                         "PRINT " ++ show nExpr ++ "\n"
+                                         "PRINT " ++ show nExpr
+
 showCommand n (Draw tExpr)             = indentator n ++
-                                         "DRAW " ++ show tExpr ++ "\n"
-showCommand n (Seq cmds)               = foldr ((++) . (\x -> showCommand n x)) [] cmds
+                                         "DRAW " ++ show tExpr
+
+showCommand n (Seq cmds)               = foldr ((++) . (\x -> showCommand n x ++ "\n")) [] cmds
+
 showCommand n (Cond bExpr cmds1 cmds2) = indentator n ++
                                          "IF (" ++ show bExpr ++ ")\n" ++
                                          showCommand (n + 1) cmds1 ++
                                          "ELSE\n" ++
                                          showCommand (n + 1) cmds2 ++
-                                         "ENDIF\n"
+                                         "ENDIF"
+
 showCommand n (Loop bExpr cmd)         = indentator n ++
                                          "WHILE (" ++ show bExpr ++ ")\n" ++
                                          showCommand (n + 1) cmd ++
-                                         "ENDWHILE\n"
+                                         "ENDWHILE"
+
 showCommand n (DeclareVector id nExpr) = indentator n ++
                                          id ++ 
-                                         " = TUBEVECTOR OF " ++ show nExpr ++ "\n"
-showCommand n (Push id1 id2)           = indentator n ++
-                                         "PUSH " ++ id1 ++ " " ++ id2 ++ "\n"
-showCommand n (Pop id1 id2)            = indentator n ++
-                                         "POP " ++ id1 ++ " " ++ id2 ++ "\n"
+                                         " = TUBEVECTOR OF " ++ show nExpr
 
+showCommand n (Push id1 id2)           = indentator n ++
+                                         "PUSH " ++ id1 ++ " " ++ id2
+
+showCommand n (Pop id1 id2)            = indentator n ++
+                                         "POP " ++ id1 ++ " " ++ id2
+
+
+-------------------------------------
+-------------------------------------
+-- Memory Data
+-------------------------------------
+-------------------------------------
+
+-------------------------------------
+-- P3
+-------------------------------------
+
+data Val a =
+    NVal a
+    | TVal a a
+    | CVal a
+    | VTVal Int [(a, a)]
+    deriving (Show, Eq, Ord)
+
+class SymTable m where
+    update :: m a -> String -> Val a -> m a
+    value  :: m a -> String -> Maybe (Val a)
+    start  :: m a
+
+data MemVal a =
+    KeyVal Ident (Val a)
+    deriving (Show)
+
+
+-- Memory List
+
+data MemList a =
+    MemMap [MemVal a]
+    deriving (Show)
+
+concatMem :: MemList a -> MemList a -> MemList a
+concatMem (MemMap l1) (MemMap l2) = MemMap (l1 ++ l2)
+
+instance SymTable MemList where
+    -- llista ordenada de menor a major
+    update (MemMap []) key val = MemMap [KeyVal key val]
+    update (MemMap (e:se)) key val
+        | eKey == key = MemMap (KeyVal key val : se)
+        | eKey > key  = MemMap (KeyVal key val : (e : se))
+        | otherwise   = concatMem (MemMap [e]) (update (MemMap se) key val)
+        where KeyVal eKey eValue = e
+    value (MemMap []) key = Nothing
+    value (MemMap (e:se)) key
+        | eKey == key = Just eValue
+        | eKey > key  = Nothing -- com esta ordenada ja podem dir que no esta la clau.
+        | otherwise   = value (MemMap se) key
+        where KeyVal eKey eValue = e
+    start = (MemMap [])
+
+
+-- Memory BST
+
+data MemBST a =
+    BSTNode (MemVal a) (MemBST a) (MemBST a)
+    | BSTEmpty
+    deriving (Show)
+
+instance SymTable MemBST where
+    update BSTEmpty key val =
+        BSTNode (KeyVal key val) BSTEmpty BSTEmpty
+    update (BSTNode tuple leftChild rightChild) key val
+        | key == tKey = BSTNode (KeyVal key val) leftChild rightChild
+        | key < tKey  = BSTNode tuple (update leftChild key val) rightChild
+        | otherwise   = BSTNode tuple leftChild (update rightChild key val)
+        where KeyVal tKey tValue = tuple
+    value BSTEmpty key = Nothing
+    value (BSTNode tuple leftChild rightChild) key
+        | key == tKey = Just (tValue)
+        | key < tKey  = value leftChild key
+        | otherwise   = value rightChild key
+        where KeyVal tKey tValue = tuple
+    start = BSTEmpty
+
+
+-------------------------------------
+-------------------------------------
+-- Semantics
+-------------------------------------
+-------------------------------------
+
+-------------------------------------
+-- P3
+-------------------------------------
+
+--interpretCommand: 
+-- Interpreta un programa (Command) per una memoria (m a) i entrada ([a]) donades.
+-- Retorna una tripleta amb:
+--   1. La llista de totes les impresions (print i/o draw) o un missatge d'error.
+--   2. La memoria resultant.
+--   3. Entrada d'espres d'executar el codi.
+interpretCommand :: (Num a, Ord a, SymTable m) =>
+    m a -> [a] -> Command a -> ((Either String [a]), m a, [a])
