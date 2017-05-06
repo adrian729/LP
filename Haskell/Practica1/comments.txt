@@ -2,9 +2,21 @@
 "conditional2", ja que al compilar es queixa (potser es algo
 local del portatil personal).
 
+-> TUBS
+l’operació DRAW, que donada una expressió que
+defineix un tub el mostra, amb una seqüència de valors numèrics, on el primer
+és el diàmetre i la resta són la longitud de tots els tubs bàsics (no composats
+per altres tubs) que la formen tal i com s’ha construı̈t.
+  -> com possa aixo guardo els tubs com a composicio de tubs
 
 
 
 -> ARREGLAR:
 
 EXPRESSIONS, NO MIRA ELS PARENTESIS!!!!!!! (nExp i bExp)
+
+
+
+
+PYTHON
+no ++ i --... perque?

@@ -1,4 +1,4 @@
-import System.IO
+--import System.IO
 
 -------------------------------------
 -------------------------------------
@@ -13,6 +13,17 @@ import System.IO
 --identificadors
 type Ident = String
 
+--expressions numeriques
+data NExpr a =
+    Var Ident
+    | Const a
+    | Plus (NExpr a) (NExpr a)
+    | Minus (NExpr a) (NExpr a)
+    | Times (NExpr a) (NExpr a)
+    | Length Ident
+    | Diameter Ident
+    deriving (Read)
+
 --expressions booleanes
 data BExpr a =
     And (BExpr a) (BExpr a)
@@ -23,17 +34,6 @@ data BExpr a =
     | Eq (NExpr a) (NExpr a)
     | Empty Ident
     | Full Ident
-    deriving (Read)
-
---expressions numeriques
-data NExpr a =
-    Var Ident
-    | Const a
-    | Plus (NExpr a) (NExpr a)
-    | Minus (NExpr a) (NExpr a)
-    | Times (NExpr a) (NExpr a)
-    | Length Ident
-    | Diameter Ident
     deriving (Read)
 
 --expressions de conector
@@ -75,7 +75,7 @@ data Command a =
 -------------------------------------
 -- P2
 -------------------------------------
-instance (Show a) => Show (BExpr a) where
+instance Show a => Show (BExpr a) where
     --casos amb parentitzacio
     show (And (Or a b) (Or c d))  = "(" ++ show (Or a b) ++ ")" ++
                                     " AND " ++ "(" ++ show (Or c d) ++ ")"
@@ -101,7 +101,7 @@ instance (Show a) => Show (BExpr a) where
     show (Empty id)               = "EMPTY(" ++ id ++ ")"
     show (Full id)                = "FULL(" ++ id ++ ")"
 
-instance (Show a) => Show (NExpr a) where
+instance Show a => Show (NExpr a) where
     show (Var id)            = id
     show (Const a)           = show a
     show (Plus nExp1 nExp2)  = show nExp1 ++ " + " ++ show nExp2
@@ -110,7 +110,7 @@ instance (Show a) => Show (NExpr a) where
     show (Length id)         = "LENGTH(" ++ id ++ ")"
     show (Diameter id)       = "DIAMETER(" ++ id ++ ")"
 
-instance (Show a) => Show (TExpr a) where
+instance Show a => Show (TExpr a) where
     show (TVar id)                   = id
     show (Merge tExpr1 cExpr tExpr2) = "MERGE " ++ show tExpr1 ++
                                        " " ++ show cExpr ++
@@ -118,11 +118,11 @@ instance (Show a) => Show (TExpr a) where
     show (Tube nExpr1 nExpr2)        = "TUBE " ++ show nExpr1 ++
                                        " " ++ show nExpr2
 
-instance (Show a) => Show (CExpr a) where
+instance Show a => Show (CExpr a) where
     show (CVar id)         = id
     show (Connector nExpr) = "CONNECTOR " ++ show nExpr
 
-instance (Show a) => Show (Command a) where
+instance Show a => Show (Command a) where
     show a = showCommand 0 a
 
 indentator :: Int -> String
@@ -186,31 +186,80 @@ showCommand n (Pop id1 id2)            = indentator n ++
 -- P3
 -------------------------------------
 
+-- Value
 data Val a =
     NVal a
-    | TVal a a
+    | TVal [a] a
     | CVal a
-    | VTVal Int [(a, a)]
+    | VTVal Int [([a], a)]
+    | EmptyVal
     deriving (Show, Eq, Ord)
 
+-- type check
+isNVal :: Val a -> Bool
+isNVal (NVal _) = True
+isNVal _        = False
+
+isTVal :: Val a -> Bool
+isTVal (TVal _ _) = True
+isTVal _          = False
+
+isCVal :: Val a -> Bool
+isCVal (CVal _) = True
+isCVal _        = False
+
+isVTVAL :: Val a -> Bool
+isVTVAL (VTVal _ _) = True
+isVTVAL _           = False
+
+isEmptyVal :: Val a -> Bool
+isEmptyVal EmptyVal = True
+isEmptyVal _        = False
+
+-- get value
+fromNVal :: Val a -> a
+fromNVal (NVal x) = x
+
+fromTVal :: Val a -> ([a], a)
+fromTVal (TVal l d) = (l, d)
+
+fromCVal :: Val a -> a
+fromCVal (CVal d) = d
+
+fromVTVal :: Val a -> (Int, [([a], a)])
+fromVTVal (VTVal s lt) = (s, lt)
+
+-- length i diameter TVal
+lengthTVal :: (Num a) => Val a -> a
+lengthTVal (TVal l _) = sum l
+
+diameterTVal :: (Num a) => Val a -> a
+diameterTVal (TVal _ d) = d
+
+-- diameter CVal
+diameterCVal :: (Num a) => Val a -> a
+diameterCVal = fromCVal
+
+-- Memory Value
+data MemVal a =
+    KeyVal Ident (Val a)
+    deriving Show
+
+
+-- SymTable
 class SymTable m where
     update :: m a -> String -> Val a -> m a
     value  :: m a -> String -> Maybe (Val a)
     start  :: m a
 
-data MemVal a =
-    KeyVal Ident (Val a)
-    deriving (Show)
-
 
 -- Memory List
-
 data MemList a =
     MemMap [MemVal a]
-    deriving (Show)
+    deriving Show
 
 concatMem :: MemList a -> MemList a -> MemList a
-concatMem (MemMap l1) (MemMap l2) = MemMap (l1 ++ l2)
+concatMem (MemMap l1) (MemMap l2) = MemMap $ l1 ++ l2
 
 instance SymTable MemList where
     -- llista ordenada de menor a major
@@ -226,15 +275,14 @@ instance SymTable MemList where
         | eKey > key  = Nothing -- com esta ordenada ja podem dir que no esta la clau.
         | otherwise   = value (MemMap se) key
         where KeyVal eKey eValue = e
-    start = (MemMap [])
+    start = MemMap []
 
 
 -- Memory BST
-
 data MemBST a =
     BSTNode (MemVal a) (MemBST a) (MemBST a)
     | BSTEmpty
-    deriving (Show)
+    deriving Show
 
 instance SymTable MemBST where
     update BSTEmpty key val =
@@ -246,11 +294,48 @@ instance SymTable MemBST where
         where KeyVal tKey tValue = tuple
     value BSTEmpty key = Nothing
     value (BSTNode tuple leftChild rightChild) key
-        | key == tKey = Just (tValue)
+        | key == tKey = Just tValue
         | key < tKey  = value leftChild key
         | otherwise   = value rightChild key
         where KeyVal tKey tValue = tuple
     start = BSTEmpty
+
+
+-- Memory
+data Mem a =
+    MemList a
+    | MemBST a
+
+emptyMemVars :: SymTable m => m a -> [Ident] -> m a
+emptyMemVars mem ids = foldr (\x y -> update y x EmptyVal) mem ids
+
+-------------------------------------
+-------------------------------------
+-- Errors
+-------------------------------------
+-------------------------------------
+
+-------------------------------------
+-- P3
+-------------------------------------
+
+undefinedVarErr :: String
+undefinedVarErr = "undefined variable"
+
+noContentErr :: String
+noContentErr = "variable content no longer exists"
+
+unmatchedDiameterErr :: String
+unmatchedDiameterErr = "unmatched diameter"
+
+emptyVectorErr :: String
+emptyVectorErr = "empty vector"
+
+fullVectorErr :: String
+fullVectorErr = "full vector"
+
+typeErr :: String
+typeErr = "type error"
 
 
 -------------------------------------
@@ -263,11 +348,252 @@ instance SymTable MemBST where
 -- P3
 -------------------------------------
 
+--evalNExpr: 
+-- Evalua, per una memoria (m a) donada, l'expressio numerica (NExpr).
+-- Retorna el resultat d'evaluar l'expressio o un missatge d'error.
+evalNExpr :: (Num a, Ord a, SymTable m) => m a -> NExpr a -> Either String a
+--Var Ident
+evalNExpr mem (Var id)
+    | isNothing' val             = Left undefinedVarErr
+    | isEmptyVal $ fromJust' val = Left noContentErr
+    | isNVal $ fromJust' val     = Right $ fromNVal $ fromJust' val
+    | otherwise                  = Left typeErr
+    where val = value mem id
+--Const a
+evalNExpr _ (Const n) = Right n
+--Plus (NExpr a) (NExpr a)
+evalNExpr mem (Plus nExpr1 nExpr2) = evalArithmNExpr mem (+) nExpr1 nExpr2
+--Minus (NExpr a) (NExpr a)
+evalNExpr mem (Minus nExpr1 nExpr2) = evalArithmNExpr mem (-) nExpr1 nExpr2
+--Times (NExpr a) (NExpr a)
+evalNExpr mem (Times nExpr1 nExpr2) = evalArithmNExpr mem (*) nExpr1 nExpr2
+--Length Ident
+evalNExpr mem (Length id)
+    | isNothing' val             = Left undefinedVarErr
+    | isEmptyVal $ fromJust' val = Left noContentErr
+    | isTVal $ fromJust' val     = Right $ lengthTVal $ fromJust' val
+    | otherwise                  = Left typeErr
+    where val = value mem id
+--Diameter Ident
+evalNExpr mem (Diameter id)
+    | isNothing' val             = Left undefinedVarErr
+    | isEmptyVal $ fromJust' val = Left noContentErr
+    | isTVal $ fromJust' val     = Right $ diameterTVal $ fromJust' val
+    | isCVal $ fromJust' val     = Right $ fromCVal $ fromJust' val
+    | otherwise                  = Left typeErr
+    where val = value mem id
+
+--evalArithmNExpr: 
+-- Evalua, per una memoria (m a) donada, una funcio aritmetica (a->a->a) sobre
+-- dues expressions numeriques (NExpr).
+-- Retorna el resultat d'evaluar l'expressio o un missatge d'error.
+evalArithmNExpr :: (Num a, Ord a, SymTable m) =>
+    m a -> (a -> a -> a) -> NExpr a -> NExpr a -> Either String a
+evalArithmNExpr mem f nExpr1 nExpr2
+    | isLeft' res1 = res1
+    | isLeft' res2 = res2
+    | otherwise   = Right $ f (fromRight' res1) (fromRight' res2)
+    where res1 = evalNExpr mem nExpr1
+          res2 = evalNExpr mem nExpr2
+
+
+--evalBExpr: 
+-- Evalua, per una memoria (m a) donada, l'expressio booleana (BExpr).
+-- Retorna el resultat d'evaluar l'expressio o un missatge d'error.
+evalBExpr :: (Num a, Ord a, SymTable m) => m a -> BExpr a -> Either String Bool
+--And (BExpr a) (BExpr a)
+evalBExpr mem (And bExpr1 bExpr2) = evalLogicExpr mem (&&) bExpr1 bExpr2
+--Or (BExpr a) (BExpr a)
+evalBExpr mem (Or bExpr1 bExpr2) = evalLogicExpr mem (||) bExpr1 bExpr2
+--Not (BExpr a)
+evalBExpr mem (Not bExpr)
+    | isLeft' res = res
+    | otherwise   = Right $ not $ fromRight' res
+    where res = evalBExpr mem bExpr
+--Gt (NExpr a) (NExpr a)
+evalBExpr mem (Gt nExpr1 nExpr2) = evalCompExpr mem (>) nExpr1 nExpr2
+--Lt (NExpr a) (NExpr a)
+evalBExpr mem (Lt nExpr1 nExpr2) = evalCompExpr mem (<) nExpr1 nExpr2
+--Eq (NExpr a) (NExpr a)
+evalBExpr mem (Eq nExpr1 nExpr2) = evalCompExpr mem (==) nExpr1 nExpr2
+--Empty Ident
+evalBExpr mem (Empty id)
+    | isNothing' val             = Left undefinedVarErr
+    | isEmptyVal $ fromJust' val = Left noContentErr
+    | isVTVAL $ fromJust' val    = let (size, vec) = fromVTVal $ fromJust' val
+                                   in Right $ (length vec) == 0
+    | otherwise                  = Left typeErr
+    where val = value mem id
+--Full Ident
+evalBExpr mem (Full id)
+    | isNothing' val             = Left undefinedVarErr
+    | isEmptyVal $ fromJust' val = Left noContentErr
+    | isVTVAL $ fromJust' val    = let (size, vec) = fromVTVal $ fromJust' val
+                                   in Right $ (length vec) == size
+    | otherwise                  = Left typeErr
+    where val = value mem id
+
+--evalLogicExpr: 
+-- Evalua, per una memoria (m a) donada, una funcio logica (Bool -> Bool -> Bool) sobre
+-- dues expressions booleanes (BExpr).
+-- Retorna el resultat d'evaluar l'expressio o un missatge d'error.
+evalLogicExpr :: (Num a, Ord a, SymTable m) =>
+    m a -> (Bool -> Bool -> Bool) -> BExpr a -> BExpr a -> Either String Bool
+evalLogicExpr mem f bExpr1 bExpr2
+    | isLeft' res1 = res1
+    | isLeft' res2 = res2
+    | otherwise    = Right $ f (fromRight' res1) (fromRight' res2)
+    where res1 = evalBExpr mem bExpr1
+          res2 = evalBExpr mem bExpr2
+
+--evalCompExpr: 
+-- Evalua, per una memoria (m a) donada, una funcio de comparacio (a->a->Bool) sobre
+-- dues expressions numeriques (NExpr).
+-- Retorna el resultat d'evaluar l'expressio o un missatge d'error.
+evalCompExpr :: (Num a, Ord a, SymTable m) =>
+    m a -> (a -> a -> Bool) -> NExpr a -> NExpr a -> Either String Bool
+evalCompExpr mem f nExpr1 nExpr2
+    | isLeft' res1 = Left $ fromLeft' res1
+    | isLeft' res2 = Left $ fromLeft' res2
+    | otherwise   = Right $ f (fromRight' res1) (fromRight' res2)
+    where res1 = evalNExpr mem nExpr1
+          res2 = evalNExpr mem nExpr2
+
+
+--evalCExpr:
+-- Evalua, per una memoria (m a) donada, l'expressio de connector (CExpr).
+-- Retorna:
+--   1. El resultat d'evaluar l'expressio o un missatge d'error.
+--   2. Un llistat dels Identificadors ussats.
+evalCExpr :: (Num a, Ord a, SymTable m) =>
+    m a -> CExpr a -> (Either String (Val a), [Ident])
+--CVar Ident
+evalCExpr mem (CVar id)
+    | isNothing' val             = (Left undefinedVarErr, [])
+    | isEmptyVal $ fromJust' val = (Left noContentErr, [])
+    | isCVal $ fromJust' val     = (Right $ fromJust' val, [id])
+    | otherwise                  = (Left typeErr, [])
+    where val = value mem id
+--Connector (NExpr a)
+evalCExpr mem (Connector nExpr)
+    | isLeft' res = (Left $ fromLeft' res, [])
+    | otherwise   = (Right $ CVal $ fromRight' res, [])
+    where res = evalNExpr mem nExpr
+
+
+--evalTExpr:
+-- Evalua, per una memoria (m a) donada, l'expressio de tub (TExpr).
+-- Retorna:
+--   1. El resultat d'evaluar l'expressio o un missatge d'error.
+--   2. Un llistat dels Identificadors ussats. En cas d'error sera buida.
+evalTExpr :: (Num a, Ord a, SymTable m) =>
+    m a -> TExpr a -> (Either String (Val a), [Ident])
+--TVar Ident
+evalTExpr mem (TVar id)
+    | isNothing' val             = (Left undefinedVarErr, [])
+    | isEmptyVal $ fromJust' val = (Left noContentErr, [])
+    | isTVal $ fromJust' val     = (Right $ fromJust' val, [id])
+    | otherwise                  = (Left typeErr, [])
+    where val = value mem id
+--Merge (TExpr a) (CExpr a) (TExpr a)
+evalTExpr mem (Merge tExpr1 cExpr tExpr2)
+    | isLeft' $ fst resT1 = (Left $ fromLeft' $ fst resT1, [])
+    | isLeft' $ fst resC  = (Left $ fromLeft' $ fst resC, [])
+    | isLeft' $ fst resT2 = (Left $ fromLeft' $ fst resT2, [])
+    | otherwise           = tryMerge
+                                (fromRight' $ fst resT1)
+                                (fromRight' $ fst resC)
+                                (fromRight' $ fst resT2)
+                                ((snd resT1) ++ (snd resC) ++ (snd resT2))
+    where resT1 = evalTExpr mem tExpr1
+          resC  = evalCExpr mem cExpr
+          resT2 = evalTExpr mem tExpr2
+--Tube (NExpr a) (NExpr a)
+evalTExpr mem (Tube nExpr1 nExpr2)
+    | isLeft' res1 = (Left $ fromLeft' res1, [])
+    | isLeft' res2 = (Left $ fromLeft' res2, [])
+    | otherwise    = (Right $ TVal [fromRight' res1] (fromRight' res2), [])
+    where res1 = evalNExpr mem nExpr1
+          res2 = evalNExpr mem nExpr2
+
+--tryMerge:
+-- intenta fer el merge de dos tubs i un conector (TVal - CVal - TVal).
+-- Retorna:
+--  1. El TVal resultant o un missatge d'error.
+--  2. La llista d'identificadors dels conectors i tubs ussats en el merge.
+--     Si hi ha un error la llista sera buida.
+tryMerge :: (Num a, Ord a) => 
+    Val a -> Val a -> Val a -> [Ident] -> (Either String (Val a), [Ident])
+tryMerge t1 c t2 ids
+    | diam1 /= diam2 || diam2 /= diam3         = (Left unmatchedDiameterErr, [])
+    | otherwise                                =
+        (Right $ TVal ((fst $ fromTVal t1) ++ (fst $ fromTVal t2)) diam2, ids)
+    where diam1 = diameterTVal t1
+          diam2 = diameterCVal c
+          diam3 = diameterTVal t2
+
+
 --interpretCommand: 
--- Interpreta un programa (Command) per una memoria (m a) i entrada ([a]) donades.
+-- Interpreta per una memoria (m a) i entrada ([a]) donades un programa (Command).
 -- Retorna una tripleta amb:
 --   1. La llista de totes les impresions (print i/o draw) o un missatge d'error.
 --   2. La memoria resultant.
---   3. Entrada d'espres d'executar el codi.
+--   3. Entrada restant despres d'executar el codi.
 interpretCommand :: (Num a, Ord a, SymTable m) =>
     m a -> [a] -> Command a -> ((Either String [a]), m a, [a])
+--Copy Ident Ident
+interpretCommand mem inputList (Copy id1 id2)
+    | isNothing' val2             = (Left undefinedVarErr, mem, inputList)
+    | isEmptyVal $ fromJust' val2 = (Left noContentErr, mem, inputList)
+    | otherwise                   = let newMem = update mem id1 $ fromJust' val2
+                                    in (Right [], newMem, inputList)
+    where val2 = value mem id2
+--TAssign Ident (TExpr a)
+interpretCommand mem inputList (TAssign id tExpr)
+    | isLeft' resTExpr = (Left $ fromLeft' resTExpr, mem, inputList)
+    | otherwise        = let newMem = emptyMemVars mem idList
+                         in (Right [], newMem, inputList)
+    where (resTExpr, idList) = evalTExpr mem tExpr
+--CAssign Ident (CExpr a)
+
+--Input Ident
+--Print (NExpr a)
+--Draw (TExpr a)
+--Seq [Command a]
+--Cond (BExpr a) (Command a) (Command a)
+--Loop (BExpr a) (Command a)
+--DeclareVector Ident (NExpr a)
+--Push Ident Ident
+--Pop Ident Ident
+--Split  Ident Ident Ident
+          
+--TODO tot
+
+
+-------------------------------------
+-------------------------------------
+-- Helper functions
+-------------------------------------
+-------------------------------------
+
+-- Maybe
+isNothing' :: Maybe a -> Bool
+isNothing' Nothing = True
+isNothing' _       = False
+
+fromJust' :: Maybe a -> a
+fromJust' (Just x) = x
+
+-- Either
+isLeft' :: Either a b -> Bool
+isLeft' (Left l) = True
+isLeft' _        = False
+
+isRight' :: Either a b -> Bool
+isRight' = not . isLeft'
+
+fromLeft' :: Either a b -> a
+fromLeft' (Left l) = l
+
+fromRight' :: Either a b -> b
+fromRight' (Right r) = r
