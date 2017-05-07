@@ -623,23 +623,46 @@ interpretCommand mem inputList (DeclareVector id nExpr)
                     in (Right [], newMem, inputList)
     where res = evalNExpr mem nExpr
 --Push Ident Ident
-interpretCommand mem inputList (Push id1 id2)
+interpretCommand mem inputList (Push idv idt)
     | isNothing' v || isNothing' t  = (Left undefinedVarErr, mem, inputList)
     | (isEmptyVal $ fromJust' v) || (isEmptyVal $ fromJust' t)
                                     = (Left noContentErr, mem, inputList)
     | not $ (isVTVAL $ fromJust' v) && (isTVal $ fromJust' t)
                                     = (Left typeErr, mem, inputList)
     | isFull $ fromJust' v          = (Left fullVectorErr, mem, inputList)
-    | otherwise                     = let TVal tList tLen = fromJust' t
+    | otherwise                     = let TVal tList tDiam = fromJust' t
                                           VTVal tVec s ms = fromJust' v
-                                          newVec = VTVal ((tList, tLen):tVec) (s+1) ms
-                                          newMem = update mem id1 newVec
+                                          newVec = VTVal ((tList, tDiam):tVec) (s+1) ms
+                                          newMem = update mem idv newVec
                                       in (Right [], newMem, inputList)
-    where v = value mem id1
-          t = value mem id2
+    where v = value mem idv
+          t = value mem idt
 --Pop Ident Ident
+interpretCommand mem inputList (Pop idv idt)
+    | isNothing' v                = (Left undefinedVarErr, mem, inputList)
+    | isEmptyVal $ fromJust' v    = (Left noContentErr, mem, inputList)
+    | not $ isVTVAL $ fromJust' v = (Left typeErr, mem, inputList)
+    | isEmpty $ fromJust' v       = (Left emptyVectorErr, mem, inputList)
+    | otherwise                   = let VTVal ((tList, tDiam):tVec) s ms = fromJust' v
+                                        newVec = VTVal tVec (s-1) ms
+                                        newTube = TVal tList tDiam
+                                        newMemVec = update mem idv newVec
+                                        newMem = update mem idt newTube
+                                      in (Right [], newMem, inputList)
+    where v = value mem idv
 --Split  Ident Ident Ident
---TODO tot
+interpretCommand mem inputList (Split idlt idrt idt)
+    | isNothing' t             = (Left undefinedVarErr, mem, inputList)
+    | isEmptyVal $ fromJust' t = (Left noContentErr, mem, inputList)
+    | isTVal $ fromJust' t     = let tlen = lengthTVal $ fromJust' t
+                                     leftLen = tlen - (part2 tlen)
+                                     (tl, tr) = splitTube (fromJust' t) leftLen
+                                     eraseTMem = update mem idt EmptyVal
+                                     tlMem = update eraseTMem idlt tl
+                                     newMem = update tlMem idrt tr
+                                 in (Right [], newMem, inputList) --TODO update mem, etc
+    | otherwise                = (Left typeErr, mem, inputList)
+    where t = value mem idt
 
 
 --concatCommantResults: 
@@ -650,15 +673,47 @@ interpretCommand mem inputList (Push id1 id2)
 --   1. La llista de totes les impresions (print i/o draw) o un missatge d'error.
 --   2. La memoria resultant.
 --   3. Entrada restant despres d'executar el codi.
-concatCommantResults :: (Num a, Ord a, SymTable m) => 
+concatCommantResults :: (Num a, Ord a, SymTable m) =>
     ((Either String [a]), m a, [a]) -> ((Either String [a]), m a, [a]) ->
     ((Either String [a]), m a, [a])
-concatCommantResults (either1, mem, inputList) (either2, newMem, newInputList)
-    | isLeft' either1 = (either1, mem, inputList)
-    | isLeft' either2 = (either2, newMem, newInputList)
+concatCommantResults p1@(either1, mem, inputList) p2@(either2, newMem, newInputList)
+    | isLeft' either1 = p1
+    | isLeft' either2 = p2
     | otherwise       = (Right $ res1 ++ res2, newMem, newInputList)
     where res1 = fromRight' either1
           res2 = fromRight' either2
+
+--part2:
+-- Donat un nombre x.
+-- Retorna el nombre sense decimals més gran pel qual el seu doble es menor o igual que x.
+part2 :: (Num a, Ord a) => a -> a -- Implementacio MOLT ineficient, buscar una millor
+part2 x = part2' x 0
+
+--part2':
+-- Donat un nombre x i un nombre m.
+-- Retorna m si el doble d'ell mes 1 es major que x, si no fa una crida recursiva a ella
+-- mateixa amb m + 1.
+part2' :: (Num a, Ord a) => a -> a -> a -- Implementacio MOLT ineficient, buscar una millor
+part2' x m
+    | m' * 2 > x = m
+    | otherwise  = part2' x m'
+    where m' = m + 1
+
+--splitTube:
+-- Donades una variable de tub i un nombre l.
+-- Parteix el tub en dos tubs, el primer amb longitud l i l'altre amb la resta.
+-- Els retorna en una tupla.
+splitTube :: (Num a, Ord a) => Val a -> a -> (Val a, Val a)
+splitTube p1@(TVal [] diam) _ = (p1, p1)
+splitTube p1@(TVal (t:st) diam) m
+    | m == 0    = (TVal [] diam, p1)
+    | t == m    = (TVal [m] diam, TVal st diam)
+    | t > m     = let tr = t - m
+                  in (TVal [m] diam, TVal (tr:st) diam)
+    | otherwise = let m' = m - t
+                      (TVal ll diam, t2) = splitTube (TVal st diam) m'
+                  in (TVal ([t] ++ ll) diam, t2)
+splitTube _ _ = undefined
 
 
 -------------------------------------

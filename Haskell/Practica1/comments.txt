@@ -17,7 +17,13 @@ com amb una assignacio).
 -> Tubs/Vector/conector: valors menors a 0??? Fer saltar error¿?
 
 
-
+-> Tubs mida 1 (split)? Tubs mida menor a 1??? Tubs mida 0....????
 
 PYTHON
 no ++ i --... perque?
+
+
+l’operació DRAW, que donada una expressió que
+defineix un tub el mostra, amb una seqüència de valors numèrics, on el primer
+és el diàmetre i la resta són la longitud de tots els tubs bàsics (no composats
+per altres tubs) que la formen tal i com s’ha construı̈t.
