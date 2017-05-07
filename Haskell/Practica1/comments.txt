@@ -9,11 +9,12 @@ defineix un tub el mostra, amb una seqüència de valors numèrics, on el primer
 per altres tubs) que la formen tal i com s’ha construı̈t.
   -> com possa aixo guardo els tubs com a composicio de tubs
 
+-- Al fer DRAW d'un merge (o expressio en general), no modifico la memoria (entenc
+que nomes es vol mostrar el resultat de l'expressio, no s'esta creant un nou tub
+com amb una assignacio).
 
 
--> ARREGLAR:
-
-EXPRESSIONS, NO MIRA ELS PARENTESIS!!!!!!! (nExp i bExp)
+-> Tubs/Vector/conector: valors menors a 0??? Fer saltar error¿?
 
 
 

@@ -191,7 +191,7 @@ data Val a =
     NVal a
     | TVal [a] a
     | CVal a
-    | VTVal Int [([a], a)]
+    | VTVal [([a], a)] a a -- size actual, vector, max size
     | EmptyVal
     deriving (Show, Eq, Ord)
 
@@ -209,7 +209,7 @@ isCVal (CVal _) = True
 isCVal _        = False
 
 isVTVAL :: Val a -> Bool
-isVTVAL (VTVal _ _) = True
+isVTVAL (VTVal _ _ _) = True
 isVTVAL _           = False
 
 isEmptyVal :: Val a -> Bool
@@ -219,26 +219,42 @@ isEmptyVal _        = False
 -- get value
 fromNVal :: Val a -> a
 fromNVal (NVal x) = x
+fromNVal _        = undefined
 
 fromTVal :: Val a -> ([a], a)
 fromTVal (TVal l d) = (l, d)
+fromTVal _          = undefined
 
 fromCVal :: Val a -> a
 fromCVal (CVal d) = d
+fromCVal _        = undefined
 
-fromVTVal :: Val a -> (Int, [([a], a)])
-fromVTVal (VTVal s lt) = (s, lt)
+fromVTVal :: Val a -> ([([a], a)], a, a)
+fromVTVal (VTVal list size maxSize) = (list, size, maxSize)
+fromVTVal _            = undefined
 
--- length i diameter TVal
+-- TVal functions
 lengthTVal :: (Num a) => Val a -> a
 lengthTVal (TVal l _) = sum l
+lengthTVal _          = undefined
 
 diameterTVal :: (Num a) => Val a -> a
 diameterTVal (TVal _ d) = d
+diameterTVal _          = undefined
 
--- diameter CVal
+-- CVal functions
 diameterCVal :: (Num a) => Val a -> a
 diameterCVal = fromCVal
+
+-- VTVal functions
+isEmpty :: (Num a, Ord a) => Val a -> Bool
+isEmpty (VTVal [] _ _) = True
+isEmpty _              = False
+
+isFull :: (Num a, Ord a) => Val a -> Bool
+isFull (VTVal _ size maxSize) = size >= maxSize
+isFull _                      = undefined
+
 
 -- Memory Value
 data MemVal a =
@@ -420,16 +436,14 @@ evalBExpr mem (Eq nExpr1 nExpr2) = evalCompExpr mem (==) nExpr1 nExpr2
 evalBExpr mem (Empty id)
     | isNothing' val             = Left undefinedVarErr
     | isEmptyVal $ fromJust' val = Left noContentErr
-    | isVTVAL $ fromJust' val    = let (size, vec) = fromVTVal $ fromJust' val
-                                   in Right $ (length vec) == 0
+    | isVTVAL $ fromJust' val    = Right $ isEmpty $ fromJust' val
     | otherwise                  = Left typeErr
     where val = value mem id
 --Full Ident
 evalBExpr mem (Full id)
     | isNothing' val             = Left undefinedVarErr
     | isEmptyVal $ fromJust' val = Left noContentErr
-    | isVTVAL $ fromJust' val    = let (size, vec) = fromVTVal $ fromJust' val
-                                   in Right $ (length vec) == size
+    | isVTVAL $ fromJust' val    = Right $ isFull $ fromJust' val
     | otherwise                  = Left typeErr
     where val = value mem id
 
@@ -555,19 +569,96 @@ interpretCommand mem inputList (TAssign id tExpr)
                          in (Right [], newMem, inputList)
     where (resTExpr, idList) = evalTExpr mem tExpr
 --CAssign Ident (CExpr a)
-
+interpretCommand mem inputList (CAssign id cExpr)
+    | isLeft' resCExpr = (Left $ fromLeft' resCExpr, mem, inputList)
+    | otherwise        = let newMem = emptyMemVars mem idList
+                         in (Right [], newMem, inputList)
+    where (resCExpr, idList) = evalCExpr mem cExpr
 --Input Ident
+interpretCommand mem inputList (Input id)
+    | null inputList = (Left "No input.", mem, inputList)
+    | otherwise      = let newMem = update mem id (NVal inp)
+                       in (Right [], newMem, sInp)
+    where (inp:sInp) = inputList
 --Print (NExpr a)
+interpretCommand mem inputList (Print nExpr)
+    | isLeft' res = (Left $ fromLeft' res, mem, inputList)
+    | otherwise   = (Right $ [fromRight' res], mem, inputList)
+    where res = evalNExpr mem nExpr
 --Draw (TExpr a)
---Seq [Command a]
+interpretCommand mem inputList (Draw tExpr)
+    | isLeft' res = (Left $ fromLeft' res, mem, inputList)
+    | otherwise   = let TVal len diam = fromRight' res
+                    in (Right $ [diam] ++ len, mem, inputList)
+    where (res, ids) = evalTExpr mem tExpr
+--Seq [Command a] -TODO!!!
+interpretCommand mem inputList (Seq []) = (Right [], mem, inputList)
+interpretCommand mem inputList (Seq (cmd:sCmd))
+    | isLeft' cmdEither = (cmdEither, newMem, newInputList)
+    | otherwise         = let resSeqTail = interpretCommand newMem newInputList (Seq sCmd)
+                              resCmd = (cmdEither, newMem, newInputList)
+                          in concatCommantResults resCmd resSeqTail
+    where (cmdEither, newMem, newInputList) = interpretCommand mem inputList cmd
 --Cond (BExpr a) (Command a) (Command a)
+interpretCommand mem inputList (Cond bExpr cmd1 cmd2)
+    | isLeft' res    = (Left $ fromLeft' res, mem, inputList)
+    | fromRight' res = interpretCommand mem inputList cmd1
+    | otherwise      = interpretCommand mem inputList cmd2
+    where res = evalBExpr mem bExpr
 --Loop (BExpr a) (Command a)
+interpretCommand mem inputList (Loop bExpr cmd)
+    | isLeft' bRes              = (Left $ fromLeft' bRes, mem, inputList)
+    | not $ fromRight' bRes     = (Right [], mem, inputList)
+    | isLeft' eitherCmd         = (eitherCmd, newMem, newInputList)
+    | otherwise                 =
+          let resCmd = (eitherCmd, newMem, newInputList)
+              resNextIt = interpretCommand newMem newInputList (Loop bExpr cmd)
+          in  concatCommantResults resCmd resNextIt
+    where bRes = evalBExpr mem bExpr
+          (eitherCmd, newMem, newInputList) = interpretCommand mem inputList cmd
 --DeclareVector Ident (NExpr a)
+interpretCommand mem inputList (DeclareVector id nExpr)
+    | isLeft' res = (Left $ fromLeft' res, mem, inputList)
+    | otherwise   = let newMem = update mem id (VTVal [] 0 (fromRight' res))
+                    in (Right [], newMem, inputList)
+    where res = evalNExpr mem nExpr
 --Push Ident Ident
+interpretCommand mem inputList (Push id1 id2)
+    | isNothing' v || isNothing' t  = (Left undefinedVarErr, mem, inputList)
+    | (isEmptyVal $ fromJust' v) || (isEmptyVal $ fromJust' t)
+                                    = (Left noContentErr, mem, inputList)
+    | not $ (isVTVAL $ fromJust' v) && (isTVal $ fromJust' t)
+                                    = (Left typeErr, mem, inputList)
+    | isFull $ fromJust' v          = (Left fullVectorErr, mem, inputList)
+    | otherwise                     = let TVal tList tLen = fromJust' t
+                                          VTVal tVec s ms = fromJust' v
+                                          newVec = VTVal ((tList, tLen):tVec) (s+1) ms
+                                          newMem = update mem id1 newVec
+                                      in (Right [], newMem, inputList)
+    where v = value mem id1
+          t = value mem id2
 --Pop Ident Ident
 --Split  Ident Ident Ident
-          
 --TODO tot
+
+
+--concatCommantResults: 
+-- Fa un merge dels resultats d'interpretar dues comandes (Command). La segona supossem
+-- que es l'ultima que s'ha executat (i per tant la memoria i input resultants seran els
+-- d'aquesta).
+-- Retorna una tripleta amb:
+--   1. La llista de totes les impresions (print i/o draw) o un missatge d'error.
+--   2. La memoria resultant.
+--   3. Entrada restant despres d'executar el codi.
+concatCommantResults :: (Num a, Ord a, SymTable m) => 
+    ((Either String [a]), m a, [a]) -> ((Either String [a]), m a, [a]) ->
+    ((Either String [a]), m a, [a])
+concatCommantResults (either1, mem, inputList) (either2, newMem, newInputList)
+    | isLeft' either1 = (either1, mem, inputList)
+    | isLeft' either2 = (either2, newMem, newInputList)
+    | otherwise       = (Right $ res1 ++ res2, newMem, newInputList)
+    where res1 = fromRight' either1
+          res2 = fromRight' either2
 
 
 -------------------------------------
@@ -583,6 +674,7 @@ isNothing' _       = False
 
 fromJust' :: Maybe a -> a
 fromJust' (Just x) = x
+fromJust' Nothing  = undefined
 
 -- Either
 isLeft' :: Either a b -> Bool
@@ -594,6 +686,8 @@ isRight' = not . isLeft'
 
 fromLeft' :: Either a b -> a
 fromLeft' (Left l) = l
+fromLeft' _        = undefined
 
 fromRight' :: Either a b -> b
 fromRight' (Right r) = r
+fromRight' _         = undefined
