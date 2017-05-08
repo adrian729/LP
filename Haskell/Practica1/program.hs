@@ -1,4 +1,6 @@
---import System.IO
+import System.IO 
+import System.Random
+
 
 -------------------------------------
 -------------------------------------
@@ -322,7 +324,7 @@ data Mem a =
     MemList a
     | MemBST a
 
-emptyMemVars :: SymTable m => m a -> [Ident] -> m a
+emptyMemVars :: SymTable m => m a -> [Ident] -> m a -- TODO fer el empty abans i eliminar aixo
 emptyMemVars mem ids = foldr (\x y -> update y x EmptyVal) mem ids
 
 -------------------------------------
@@ -478,20 +480,21 @@ evalCompExpr mem f nExpr1 nExpr2
 -- Evalua, per una memoria (m a) donada, l'expressio de connector (CExpr).
 -- Retorna:
 --   1. El resultat d'evaluar l'expressio o un missatge d'error.
---   2. Un llistat dels Identificadors ussats.
+--   2. La memoria despres d'ussar l'expressio.
 evalCExpr :: (Num a, Ord a, SymTable m) =>
-    m a -> CExpr a -> (Either String (Val a), [Ident])
+    m a -> CExpr a -> (Either String (Val a), m a)
 --CVar Ident
 evalCExpr mem (CVar id)
-    | isNothing' val             = (Left undefinedVarErr, [])
-    | isEmptyVal $ fromJust' val = (Left noContentErr, [])
-    | isCVal $ fromJust' val     = (Right $ fromJust' val, [id])
-    | otherwise                  = (Left typeErr, [])
+    | isNothing' val             = (Left undefinedVarErr, mem)
+    | isEmptyVal $ fromJust' val = (Left noContentErr, mem)
+    | isCVal $ fromJust' val     = let newMem = update mem id EmptyVal
+                                   in (Right $ fromJust' val, newMem)
+    | otherwise                  = (Left typeErr, mem)
     where val = value mem id
 --Connector (NExpr a)
 evalCExpr mem (Connector nExpr)
-    | isLeft' res = (Left $ fromLeft' res, [])
-    | otherwise   = (Right $ CVal $ fromRight' res, [])
+    | isLeft' res = (Left $ fromLeft' res, mem)
+    | otherwise   = (Right $ CVal $ fromRight' res, mem)
     where res = evalNExpr mem nExpr
 
 
@@ -499,34 +502,35 @@ evalCExpr mem (Connector nExpr)
 -- Evalua, per una memoria (m a) donada, l'expressio de tub (TExpr).
 -- Retorna:
 --   1. El resultat d'evaluar l'expressio o un missatge d'error.
---   2. Un llistat dels Identificadors ussats. En cas d'error sera buida.
+--   2. La memoria despres d'ussar l'expressio.
 evalTExpr :: (Num a, Ord a, SymTable m) =>
-    m a -> TExpr a -> (Either String (Val a), [Ident])
+    m a -> TExpr a -> (Either String (Val a), m a)
 --TVar Ident
 evalTExpr mem (TVar id)
-    | isNothing' val             = (Left undefinedVarErr, [])
-    | isEmptyVal $ fromJust' val = (Left noContentErr, [])
-    | isTVal $ fromJust' val     = (Right $ fromJust' val, [id])
-    | otherwise                  = (Left typeErr, [])
+    | isNothing' val             = (Left undefinedVarErr, mem)
+    | isEmptyVal $ fromJust' val = (Left noContentErr, mem)
+    | isTVal $ fromJust' val     = let newMem = update mem id EmptyVal
+                                   in (Right $ fromJust' val, newMem)
+    | otherwise                  = (Left typeErr, mem)
     where val = value mem id
 --Merge (TExpr a) (CExpr a) (TExpr a)
 evalTExpr mem (Merge tExpr1 cExpr tExpr2)
-    | isLeft' $ fst resT1 = (Left $ fromLeft' $ fst resT1, [])
-    | isLeft' $ fst resC  = (Left $ fromLeft' $ fst resC, [])
-    | isLeft' $ fst resT2 = (Left $ fromLeft' $ fst resT2, [])
-    | otherwise           = tryMerge
-                                (fromRight' $ fst resT1)
-                                (fromRight' $ fst resC)
-                                (fromRight' $ fst resT2)
-                                ((snd resT1) ++ (snd resC) ++ (snd resT2))
-    where resT1 = evalTExpr mem tExpr1
-          resC  = evalCExpr mem cExpr
-          resT2 = evalTExpr mem tExpr2
+    | isLeft' $ eitherT1 = (Left $ fromLeft' $ eitherT1, mem)
+    | isLeft' $ eitherC  = (Left $ fromLeft' $ eitherC, mem)
+    | isLeft' $ eitherT2 = (Left $ fromLeft' $ eitherT2, mem)
+    | otherwise          = tryMerge
+                               (fromRight' $ eitherT1)
+                               (fromRight' $ eitherC)
+                               (fromRight' $ eitherT2)
+                               newMem
+    where (eitherT1, memT1)  = evalTExpr mem tExpr1
+          (eitherC, memC)    = evalCExpr memT1 cExpr
+          (eitherT2, newMem) = evalTExpr memC tExpr2
 --Tube (NExpr a) (NExpr a)
 evalTExpr mem (Tube nExpr1 nExpr2)
-    | isLeft' res1 = (Left $ fromLeft' res1, [])
-    | isLeft' res2 = (Left $ fromLeft' res2, [])
-    | otherwise    = (Right $ TVal [fromRight' res1] (fromRight' res2), [])
+    | isLeft' res1 = (Left $ fromLeft' res1, mem)
+    | isLeft' res2 = (Left $ fromLeft' res2, mem)
+    | otherwise    = (Right $ TVal [fromRight' res1] (fromRight' res2), mem)
     where res1 = evalNExpr mem nExpr1
           res2 = evalNExpr mem nExpr2
 
@@ -537,17 +541,17 @@ evalTExpr mem (Tube nExpr1 nExpr2)
 --  2. La llista d'identificadors dels conectors i tubs ussats en el merge.
 --     Si hi ha un error la llista sera buida.
 tryMerge :: (Num a, Ord a) => 
-    Val a -> Val a -> Val a -> [Ident] -> (Either String (Val a), [Ident])
-tryMerge t1 c t2 ids
-    | diam1 /= diam2 || diam2 /= diam3         = (Left unmatchedDiameterErr, [])
+    Val a -> Val a -> Val a -> m a -> (Either String (Val a), m a)
+tryMerge t1 c t2 mem
+    | diam1 /= diam2 || diam2 /= diam3         = (Left unmatchedDiameterErr, mem)
     | otherwise                                =
-        (Right $ TVal ((fst $ fromTVal t1) ++ (fst $ fromTVal t2)) diam2, ids)
+        (Right $ TVal ((fst $ fromTVal t1) ++ (fst $ fromTVal t2)) diam2, mem)
     where diam1 = diameterTVal t1
           diam2 = diameterCVal c
           diam3 = diameterTVal t2
 
 
---interpretCommand: 
+--interpretCommand:
 -- Interpreta per una memoria (m a) i entrada ([a]) donades un programa (Command).
 -- Retorna una tripleta amb:
 --   1. La llista de totes les impresions (print i/o draw) o un missatge d'error.
@@ -565,15 +569,15 @@ interpretCommand mem inputList (Copy id1 id2)
 --TAssign Ident (TExpr a)
 interpretCommand mem inputList (TAssign id tExpr)
     | isLeft' resTExpr = (Left $ fromLeft' resTExpr, mem, inputList)
-    | otherwise        = let newMem = emptyMemVars mem idList
+    | otherwise        = let newMem = update memTExpr id $ fromRight' resTExpr
                          in (Right [], newMem, inputList)
-    where (resTExpr, idList) = evalTExpr mem tExpr
+    where (resTExpr, memTExpr) = evalTExpr mem tExpr
 --CAssign Ident (CExpr a)
 interpretCommand mem inputList (CAssign id cExpr)
     | isLeft' resCExpr = (Left $ fromLeft' resCExpr, mem, inputList)
-    | otherwise        = let newMem = emptyMemVars mem idList
+    | otherwise        = let newMem = update memCExpr id $ fromRight' resCExpr
                          in (Right [], newMem, inputList)
-    where (resCExpr, idList) = evalCExpr mem cExpr
+    where (resCExpr, memCExpr) = evalCExpr mem cExpr
 --Input Ident
 interpretCommand mem inputList (Input id)
     | null inputList = (Left "No input.", mem, inputList)
@@ -590,22 +594,22 @@ interpretCommand mem inputList (Draw tExpr)
     | isLeft' res = (Left $ fromLeft' res, mem, inputList)
     | otherwise   = let TVal len diam = fromRight' res
                     in (Right $ [diam] ++ len, mem, inputList)
-    where (res, ids) = evalTExpr mem tExpr
---Seq [Command a] -TODO!!!
+    where (res, newMem) = evalTExpr mem tExpr
+--Seq [Command a] --TODO: Repassar be que funcioni amb diferents exemples.
 interpretCommand mem inputList (Seq []) = (Right [], mem, inputList)
 interpretCommand mem inputList (Seq (cmd:sCmd))
-    | isLeft' cmdEither = (cmdEither, newMem, newInputList)
+    | isLeft' cmdEither = (cmdEither, mem, inputList)
     | otherwise         = let resSeqTail = interpretCommand newMem newInputList (Seq sCmd)
                               resCmd = (cmdEither, newMem, newInputList)
                           in concatCommantResults resCmd resSeqTail
     where (cmdEither, newMem, newInputList) = interpretCommand mem inputList cmd
---Cond (BExpr a) (Command a) (Command a)
+--Cond (BExpr a) (Command a) (Command a) --TODO: Repassar be que funcioni amb diferents exemples.
 interpretCommand mem inputList (Cond bExpr cmd1 cmd2)
     | isLeft' res    = (Left $ fromLeft' res, mem, inputList)
     | fromRight' res = interpretCommand mem inputList cmd1
     | otherwise      = interpretCommand mem inputList cmd2
     where res = evalBExpr mem bExpr
---Loop (BExpr a) (Command a)
+--Loop (BExpr a) (Command a) --TODO: Repassar be que funcioni amb diferents exemples.
 interpretCommand mem inputList (Loop bExpr cmd)
     | isLeft' bRes              = (Left $ fromLeft' bRes, mem, inputList)
     | not $ fromRight' bRes     = (Right [], mem, inputList)
@@ -616,13 +620,13 @@ interpretCommand mem inputList (Loop bExpr cmd)
           in  concatCommantResults resCmd resNextIt
     where bRes = evalBExpr mem bExpr
           (eitherCmd, newMem, newInputList) = interpretCommand mem inputList cmd
---DeclareVector Ident (NExpr a)
+--DeclareVector Ident (NExpr a) --TODO: Repassar be que funcioni amb diferents exemples.
 interpretCommand mem inputList (DeclareVector id nExpr)
     | isLeft' res = (Left $ fromLeft' res, mem, inputList)
     | otherwise   = let newMem = update mem id (VTVal [] 0 (fromRight' res))
                     in (Right [], newMem, inputList)
     where res = evalNExpr mem nExpr
---Push Ident Ident
+--Push Ident Ident --TODO: Repassar be que funcioni amb diferents exemples.
 interpretCommand mem inputList (Push idv idt)
     | isNothing' v || isNothing' t  = (Left undefinedVarErr, mem, inputList)
     | (isEmptyVal $ fromJust' v) || (isEmptyVal $ fromJust' t)
@@ -637,7 +641,7 @@ interpretCommand mem inputList (Push idv idt)
                                       in (Right [], newMem, inputList)
     where v = value mem idv
           t = value mem idt
---Pop Ident Ident
+--Pop Ident Ident --TODO: Repassar be que funcioni amb diferents exemples.
 interpretCommand mem inputList (Pop idv idt)
     | isNothing' v                = (Left undefinedVarErr, mem, inputList)
     | isEmptyVal $ fromJust' v    = (Left noContentErr, mem, inputList)
@@ -650,7 +654,7 @@ interpretCommand mem inputList (Pop idv idt)
                                         newMem = update mem idt newTube
                                       in (Right [], newMem, inputList)
     where v = value mem idv
---Split  Ident Ident Ident
+--Split  Ident Ident Ident --TODO: Repassar be que funcioni amb diferents exemples.
 interpretCommand mem inputList (Split idlt idrt idt)
     | isNothing' t             = (Left undefinedVarErr, mem, inputList)
     | isEmptyVal $ fromJust' t = (Left noContentErr, mem, inputList)
@@ -660,10 +664,9 @@ interpretCommand mem inputList (Split idlt idrt idt)
                                      eraseTMem = update mem idt EmptyVal
                                      tlMem = update eraseTMem idlt tl
                                      newMem = update tlMem idrt tr
-                                 in (Right [], newMem, inputList) --TODO update mem, etc
+                                 in (Right [], newMem, inputList)
     | otherwise                = (Left typeErr, mem, inputList)
     where t = value mem idt
-
 
 --concatCommantResults: 
 -- Fa un merge dels resultats d'interpretar dues comandes (Command). La segona supossem
@@ -705,15 +708,20 @@ part2' x m
 -- Els retorna en una tupla.
 splitTube :: (Num a, Ord a) => Val a -> a -> (Val a, Val a)
 splitTube p1@(TVal [] diam) _ = (p1, p1)
-splitTube p1@(TVal (t:st) diam) m
-    | m == 0    = (TVal [] diam, p1)
-    | t == m    = (TVal [m] diam, TVal st diam)
-    | t > m     = let tr = t - m
-                  in (TVal [m] diam, TVal (tr:st) diam)
-    | otherwise = let m' = m - t
-                      (TVal ll diam, t2) = splitTube (TVal st diam) m'
-                  in (TVal ([t] ++ ll) diam, t2)
-splitTube _ _ = undefined
+splitTube p1@(TVal (t:st) diam) leftLen
+    | leftLen <= 0    = (TVal [] diam, p1)
+    | t == leftLen    = (TVal [leftLen] diam, TVal st diam)
+    | t > leftLen     = let tr = t - leftLen
+                        in (TVal [leftLen] diam, TVal (tr:st) diam)
+    | otherwise       = let leftLen' = leftLen - t
+                            (TVal ll dl, t2) = splitTube (TVal st diam) leftLen'
+                        in (TVal (t:ll) diam, t2)
+
+
+interpretProgram :: (Num a, Ord a) => [a] -> Command a -> (Either String [a])
+interpretProgram inputList cmd = res
+    where (res, _, _) = interpretCommand (start :: MemBST a) inputList cmd
+-- Definit aixi, s'ha de canviar manualment si es vol ussar un BST o una llista
 
 
 -------------------------------------
@@ -746,3 +754,119 @@ fromLeft' _        = undefined
 fromRight' :: Either a b -> b
 fromRight' (Right r) = r
 fromRight' _         = undefined
+
+
+-------------------------------------
+-------------------------------------
+-- Files & IO
+-------------------------------------
+-------------------------------------
+
+-------------------------------------
+-- P4
+-------------------------------------
+
+programhs1 :: String
+programhs1 = "programhs1.txt"
+
+
+programhs2 :: String
+programhs2 = "programhs2.txt"
+
+
+readProgram :: FilePath -> IO String
+readProgram file = do ha <- openFile file ReadMode
+                      program <- hGetLine ha
+                      hClose ha
+                      return program
+
+
+uploadProgram :: Read a => FilePath -> IO (Command a)
+uploadProgram fileName = do strPrg <- readProgram fileName
+                            let program = (read strPrg :: Read a => Command a)
+                            return program
+
+
+-------------------------------------
+-------------------------------------
+-- Program
+-------------------------------------
+-------------------------------------
+
+-------------------------------------
+-- P4
+-------------------------------------
+
+execManual :: Command a -> Command a -> m a -> IO () -- TODO
+execManual prog1 prog2 mem = do return ()
+
+
+execAuto :: Command a -> Command a -> m a -> IO () -- TODO
+execAuto prog1 prog2 mem = do return ()
+
+
+chooseTest :: Command a -> Command a -> m a -> IO ()
+chooseTest prog1 prog2 mem = do putStrLn "- Tria el tipus de test (0 o 1)"
+                                putStrLn "  0 - Test comparatiu manual"
+                                putStrLn "  1 - Test comparatiu automatic"
+                                n <- readLn
+                                if n == 0
+                                then do putStrLn "Has triat test comparatiu manual (0)"
+                                        let mem = (start :: MemList a)
+                                        execManual prog1 prog2 mem
+                                else if n == 1
+                                then do putStrLn "Has triat test comparatiu automatic (1)"
+                                        let mem = (start :: MemBST a)
+                                        execAuto prog1 prog2 mem
+                                else do putStrLn "Has d'introduir 0 o 1"
+                                        chooseMem prog1 prog2
+
+
+chooseMem :: Command a -> Command a -> IO ()
+chooseMem prog1 prog2 = do putStrLn "- Tria el tipus de memoria (0 o 1)"
+                           putStrLn "  0 - llista"
+                           putStrLn "  1 - arbre binari de cerca (BST)"
+                           n <- readLn
+                           if n == 0
+                           then do putStrLn "Has triat llista (0)"
+                                   let mem = (start :: MemList a)
+                                   chooseTest prog1 prog2 mem
+                           else if n == 1
+                           then do putStrLn "Has triat BST (1)"
+                                   let mem = (start :: MemBST a)
+                                   chooseTest prog1 prog2 mem
+                           else do putStrLn "Has d'introduir 0 o 1"
+                                   chooseMem prog1 prog2
+
+
+chooseNumType :: IO ()
+chooseNumType = do putStrLn "- Tria el tipus de valors numerics (0 o 1)"
+                   putStrLn "  0 - enters"
+                   putStrLn "  1 - reals"
+                   n <- readLn
+                   if n == 0
+                   then do putStrLn "Has triat enters (0)"
+                           prog1 <- (uploadProgram programhs1 :: IO (Command Integer))
+                           prog2 <- (uploadProgram programhs2 :: IO (Command Integer))
+                           chooseMem prog1 prog2
+                   else if n == 1
+                   then do putStrLn "Has triat reals (1)"
+                           prog1 <- (uploadProgram programhs1 :: IO (Command Double))
+                           prog2 <- (uploadProgram programhs2 :: IO (Command Double))
+                           chooseMem prog1 prog2
+                   else do putStrLn "Has d'introduir 0 o 1"
+                           chooseNumType
+
+
+
+-------------------------------------
+-------------------------------------
+-- Main
+-------------------------------------
+-------------------------------------
+
+-------------------------------------
+-- P4
+-------------------------------------
+
+main = chooseNumType

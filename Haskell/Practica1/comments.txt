@@ -14,16 +14,19 @@ que nomes es vol mostrar el resultat de l'expressio, no s'esta creant un nou tub
 com amb una assignacio).
 
 
+-- El DRAW no el tinc en compte com a "us d'un tub" (no faig perdre el valor). (hi ha coses de l'exemple que no tindrien sentit si no).
+
 -> Tubs/Vector/conector: valors menors a 0??? Fer saltar error¿?
 
 
 -> Tubs mida 1 (split)? Tubs mida menor a 1??? Tubs mida 0....????
 
+
+-> Aquest programes s’executen sobre una llista de valors i retornen una llista
+de valors o un missatge d’error.
+	-> Si ho faig tal com possa, l'exemple donat no passa del primer MERGE . . .
+
 PYTHON
 no ++ i --... perque?
 
 
-l’operació DRAW, que donada una expressió que
-defineix un tub el mostra, amb una seqüència de valors numèrics, on el primer
-és el diàmetre i la resta són la longitud de tots els tubs bàsics (no composats
-per altres tubs) que la formen tal i com s’ha construı̈t.
