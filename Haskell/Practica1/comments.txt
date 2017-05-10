@@ -1,3 +1,22 @@
+Dubtes:
+
+PRACTICA HASKELL
+-> Tubs/Vector/conector: valors menors a 0??? Fer saltar error¿?
+   Tubs mida 1 (split)? Tubs mida menor a 1??? Tubs mida 0....????
+
+-> Test auto: "s’indicarà al final el nombre de test que han donat llistes
+de sortida diferents (no importa si han tingut la memòria diferent).""
+Aixo que vol dir?...
+
+
+PYTHON
+no ++ i --... perque?
+
+
+
+
+Comentaris:
+
 -- S'ha canviat al plumber.g la instruccio "conditional" per 
 "conditional2", ja que al compilar es queixa (potser es algo
 local del portatil personal).
@@ -13,20 +32,9 @@ per altres tubs) que la formen tal i com s’ha construı̈t.
 que nomes es vol mostrar el resultat de l'expressio, no s'esta creant un nou tub
 com amb una assignacio).
 
-
--- El DRAW no el tinc en compte com a "us d'un tub" (no faig perdre el valor). (hi ha coses de l'exemple que no tindrien sentit si no).
-
--> Tubs/Vector/conector: valors menors a 0??? Fer saltar error¿?
+-- El DRAW no el tinc en compte com a "us d'un tub" (no faig perdre el valor).
 
 
--> Tubs mida 1 (split)? Tubs mida menor a 1??? Tubs mida 0....????
 
-
--> Aquest programes s’executen sobre una llista de valors i retornen una llista
-de valors o un missatge d’error.
-	-> Si ho faig tal com possa, l'exemple donat no passa del primer MERGE . . .
-
-PYTHON
-no ++ i --... perque?
 
 

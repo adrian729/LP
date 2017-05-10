@@ -24,7 +24,7 @@ data NExpr a =
     | Times (NExpr a) (NExpr a)
     | Length Ident
     | Diameter Ident
-    deriving (Read)
+    deriving Read
 
 --expressions booleanes
 data BExpr a =
@@ -36,20 +36,20 @@ data BExpr a =
     | Eq (NExpr a) (NExpr a)
     | Empty Ident
     | Full Ident
-    deriving (Read)
+    deriving Read
 
 --expressions de conector
 data CExpr a =
     CVar Ident
     | Connector (NExpr a)
-    deriving (Read)
+    deriving Read
 
 --expressions de tub
 data TExpr a =
     TVar Ident
     | Merge (TExpr a) (CExpr a) (TExpr a)
     | Tube (NExpr a) (NExpr a)
-    deriving (Read)
+    deriving Read
 
 --comandes/instruccions
 data Command a =
@@ -66,7 +66,7 @@ data Command a =
     | Push Ident Ident
     | Pop Ident Ident
     | Split  Ident Ident Ident
-    deriving (Read)
+    deriving Read
 
 -------------------------------------
 -------------------------------------   
@@ -79,29 +79,31 @@ data Command a =
 -------------------------------------
 instance Show a => Show (BExpr a) where
     --casos amb parentitzacio
-    show (And (Or a b) (Or c d))  = "(" ++ show (Or a b) ++ ")" ++
-                                    " AND " ++ "(" ++ show (Or c d) ++ ")"
-    show (And (And a b) (Or c d)) = "(" ++ show (And a b) ++ ")" ++
-                                    " AND " ++ "(" ++ show (Or c d) ++ ")"
-    show (And (And a b) bExp2)    = "(" ++ show (And a b) ++ ")" ++
-                                    " AND " ++ show bExp2
-    show (And (Or a b) bExp2)     = "(" ++ show (Or a b) ++ ")" ++
-                                    " AND " ++ show bExp2
-    show (And bExp1 (Or c d))     = show bExp1 ++
-                                    " AND " ++ "(" ++ show (Or c d) ++ ")"  
-    show (Or (Or a b) bExp2)      = "(" ++ show (Or a b) ++ ")" ++
-                                    " OR " ++ show bExp2
-    show (Not (And a b))          = "NOT " ++ "(" ++ show (And a b) ++ ")"
-    show (Not (Or a b))           = "NOT "++ "(" ++ show (Or a b) ++ ")"
+    show (And bExp1@(Or a b) bExp2@(Or c d))  = "(" ++ show bExp1 ++ ")" ++
+                                                " AND " ++ "(" ++ show bExp2 ++ ")"
+    show (And bExp1@(And a b) bExp2@(Or c d)) = "(" ++ show bExp1 ++ ")" ++
+                                                " AND " ++ "(" ++ show bExp2 ++ ")"
+    show (And bExp1@(And a b) bExp2)          = "(" ++ show bExp1 ++ ")" ++
+                                                " AND " ++ show bExp2
+    show (And bExp1@(Or a b) bExp2)           = "(" ++ show bExp1 ++ ")" ++
+                                                " AND " ++ show bExp2
+    show (And bExp1 bExp2@(Or c d))           = show bExp1 ++
+                                                " AND " ++ "(" ++ show bExp2 ++ ")"  
+    show (Or bExp1@(Or a b) bExp2)            = "(" ++ show bExp1 ++ ")" ++
+                                                " OR " ++ show bExp2
+    show (Not bExp@(And a b))                 = "NOT " ++ "(" ++ show bExp ++ ")"
+    show (Not bExp@(Or a b))                  = "NOT "++ "(" ++ show bExp ++ ")"
     --casos sense parentitzacio
-    show (And bExp1 bExp2)        = show bExp1 ++ " AND " ++ show bExp2
-    show (Or bExp1 bExp2)         = show bExp1 ++ " OR " ++ show bExp2
-    show (Not bExp1)              = "NOT " ++ show bExp1
-    show (Gt nExp1 nExp2)         = show nExp1 ++ " > " ++ show nExp2
-    show (Lt nExp1 nExp2)         = show nExp1 ++ " < " ++ show nExp2
-    show (Eq nExp1 nExp2)         = show nExp1 ++ " = " ++ show nExp2
-    show (Empty id)               = "EMPTY(" ++ id ++ ")"
-    show (Full id)                = "FULL(" ++ id ++ ")"
+    show (And bExp1 bExp2)                    = show bExp1 ++ " AND " ++ show bExp2
+    show (Or bExp1 bExp2)                     = show bExp1 ++ " OR " ++ show bExp2
+    show (Not bExp)                           = "NOT " ++ show bExp
+    show (Gt nExp1 nExp2)                     = show nExp1 ++ " > " ++ show nExp2
+    show (Lt nExp1 nExp2)                     = show nExp1 ++ " < " ++ show nExp2
+    show (Eq nExp1 nExp2)                     = show nExp1 ++ " == " ++ show nExp2
+    show (Empty id)                           = "EMPTY(" ++ id ++ ")"
+    show (Full id)                            = "FULL(" ++ id ++ ")"
+
+
 
 instance Show a => Show (NExpr a) where
     show (Var id)            = id
@@ -133,47 +135,34 @@ indentator n = replicate (n*2) ' '
 showCommand :: Show a => Int -> (Command a) -> String
 showCommand n (Copy id1 id2)           = indentator n ++
                                          id1 ++ " = " ++ id2
-
 showCommand n (TAssign id tExpr)       = indentator n ++
                                          id ++ " = " ++ show tExpr
-
 showCommand n (CAssign id tExpr)       = indentator n ++
                                          id ++ " = " ++ show tExpr
-
 showCommand n (Split id1 id2 id3)      = indentator n ++
                                          "(" ++ id1 ++ "," ++ id2 ++ ")" ++
                                          " = SPLIT " ++ id3
-
 showCommand n (Input id)               = indentator n ++
                                          "INPUT " ++ id
-
 showCommand n (Print nExpr)            = indentator n ++
                                          "PRINT " ++ show nExpr
-
 showCommand n (Draw tExpr)             = indentator n ++
                                          "DRAW " ++ show tExpr
-
 showCommand n (Seq cmds)               = foldr ((++) . (\x -> showCommand n x ++ "\n")) [] cmds
-
 showCommand n (Cond bExpr cmds1 cmds2) = indentator n ++
                                          "IF (" ++ show bExpr ++ ")\n" ++
-                                         showCommand (n + 1) cmds1 ++
+                                         showCommand (succ n) cmds1 ++
                                          "ELSE\n" ++
-                                         showCommand (n + 1) cmds2 ++
+                                         showCommand (succ n) cmds2 ++
                                          "ENDIF"
-
 showCommand n (Loop bExpr cmd)         = indentator n ++
                                          "WHILE (" ++ show bExpr ++ ")\n" ++
-                                         showCommand (n + 1) cmd ++
+                                         showCommand (succ n) cmd ++
                                          "ENDWHILE"
-
 showCommand n (DeclareVector id nExpr) = indentator n ++
-                                         id ++ 
-                                         " = TUBEVECTOR OF " ++ show nExpr
-
+                                         id ++ " = TUBEVECTOR OF " ++ show nExpr
 showCommand n (Push id1 id2)           = indentator n ++
                                          "PUSH " ++ id1 ++ " " ++ id2
-
 showCommand n (Pop id1 id2)            = indentator n ++
                                          "POP " ++ id1 ++ " " ++ id2
 
@@ -191,8 +180,8 @@ showCommand n (Pop id1 id2)            = indentator n ++
 -- Value
 data Val a =
     NVal a
-    | TVal [a] a
-    | CVal a
+    | TVal [a] a -- size sub-tubs compossen tub, diametre
+    | CVal a -- diametre
     | VTVal [([a], a)] a a -- size actual, vector, max size
     | EmptyVal
     deriving (Show, Eq, Ord)
@@ -212,7 +201,7 @@ isCVal _        = False
 
 isVTVAL :: Val a -> Bool
 isVTVAL (VTVal _ _ _) = True
-isVTVAL _           = False
+isVTVAL _             = False
 
 isEmptyVal :: Val a -> Bool
 isEmptyVal EmptyVal = True
@@ -271,6 +260,13 @@ class SymTable m where
     start  :: m a
 
 
+-- SymTable'
+class SymTable' m where
+    sortedListMem :: m a -> [(String, Val a)] -- donada una estructura amb forma de diccionari 
+                                              -- de (Val a), retorna una llista ordenada amb 
+                                              -- tuples clau - contingut. Ordenacio no decreixent
+                                              -- per clau.
+
 -- Memory List
 data MemList a =
     MemMap [MemVal a]
@@ -295,6 +291,12 @@ instance SymTable MemList where
         where KeyVal eKey eValue = e
     start = MemMap []
 
+-- Llista ja ordenada
+instance SymTable' MemList where
+    sortedListMem (MemMap []) = []
+    sortedListMem (MemMap (e:se)) = (eKey, eValue):(sortedListMem $ MemMap se)
+        where KeyVal eKey eValue = e
+
 
 -- Memory BST
 data MemBST a =
@@ -318,14 +320,20 @@ instance SymTable MemBST where
         where KeyVal tKey tValue = tuple
     start = BSTEmpty
 
+instance SymTable' MemBST where
+    sortedListMem treeBST = inOrder treeBST -- BST tornara ordenat creixentment al fer inordre
+
+inOrder :: MemBST a -> [(String, Val a)]
+inOrder BSTEmpty = []
+inOrder (BSTNode tuple l r) = inOrder l ++ [(tKey, tValue)] ++ inOrder r
+    where KeyVal tKey tValue = tuple
+
 
 -- Memory
 data Mem a =
     MemList a
     | MemBST a
 
-emptyMemVars :: SymTable m => m a -> [Ident] -> m a -- TODO fer el empty abans i eliminar aixo
-emptyMemVars mem ids = foldr (\x y -> update y x EmptyVal) mem ids
 
 -------------------------------------
 -------------------------------------
@@ -354,6 +362,9 @@ fullVectorErr = "full vector"
 
 typeErr :: String
 typeErr = "type error"
+
+wrongSizeErr :: String
+wrongSizeErr = "size should be more than zero"
 
 
 -------------------------------------
@@ -402,7 +413,7 @@ evalNExpr mem (Diameter id)
     where val = value mem id
 
 --evalArithmNExpr: 
--- Evalua, per una memoria (m a) donada, una funcio aritmetica (a->a->a) sobre
+-- Evalua, per una memoria (m a) donada, una funcio aritmetica (a -> a -> a) sobre
 -- dues expressions numeriques (NExpr).
 -- Retorna el resultat d'evaluar l'expressio o un missatge d'error.
 evalArithmNExpr :: (Num a, Ord a, SymTable m) =>
@@ -410,7 +421,7 @@ evalArithmNExpr :: (Num a, Ord a, SymTable m) =>
 evalArithmNExpr mem f nExpr1 nExpr2
     | isLeft' res1 = res1
     | isLeft' res2 = res2
-    | otherwise   = Right $ f (fromRight' res1) (fromRight' res2)
+    | otherwise    = Right $ f (fromRight' res1) (fromRight' res2)
     where res1 = evalNExpr mem nExpr1
           res2 = evalNExpr mem nExpr2
 
@@ -471,7 +482,7 @@ evalCompExpr :: (Num a, Ord a, SymTable m) =>
 evalCompExpr mem f nExpr1 nExpr2
     | isLeft' res1 = Left $ fromLeft' res1
     | isLeft' res2 = Left $ fromLeft' res2
-    | otherwise   = Right $ f (fromRight' res1) (fromRight' res2)
+    | otherwise    = Right $ f (fromRight' res1) (fromRight' res2)
     where res1 = evalNExpr mem nExpr1
           res2 = evalNExpr mem nExpr2
 
@@ -530,6 +541,8 @@ evalTExpr mem (Merge tExpr1 cExpr tExpr2)
 evalTExpr mem (Tube nExpr1 nExpr2)
     | isLeft' res1 = (Left $ fromLeft' res1, mem)
     | isLeft' res2 = (Left $ fromLeft' res2, mem)
+    | fromRight' res1 <= 0 || fromRight' res2 <= 0
+                   = (Left wrongSizeErr, mem)
     | otherwise    = (Right $ TVal [fromRight' res1] (fromRight' res2), mem)
     where res1 = evalNExpr mem nExpr1
           res2 = evalNExpr mem nExpr2
@@ -594,7 +607,7 @@ interpretCommand mem inputList (Draw tExpr)
     | isLeft' res = (Left $ fromLeft' res, mem, inputList)
     | otherwise   = let TVal len diam = fromRight' res
                     in (Right $ [diam] ++ len, mem, inputList)
-    where (res, newMem) = evalTExpr mem tExpr
+    where (res, _) = evalTExpr mem tExpr
 --Seq [Command a] --TODO: Repassar be que funcioni amb diferents exemples.
 interpretCommand mem inputList (Seq []) = (Right [], mem, inputList)
 interpretCommand mem inputList (Seq (cmd:sCmd))
@@ -622,9 +635,10 @@ interpretCommand mem inputList (Loop bExpr cmd)
           (eitherCmd, newMem, newInputList) = interpretCommand mem inputList cmd
 --DeclareVector Ident (NExpr a) --TODO: Repassar be que funcioni amb diferents exemples.
 interpretCommand mem inputList (DeclareVector id nExpr)
-    | isLeft' res = (Left $ fromLeft' res, mem, inputList)
-    | otherwise   = let newMem = update mem id (VTVal [] 0 (fromRight' res))
-                    in (Right [], newMem, inputList)
+    | isLeft' res        = (Left $ fromLeft' res, mem, inputList)
+    | fromRight' res < 1 = (Left $ wrongSizeErr, mem, inputList)
+    | otherwise          = let newMem = update mem id (VTVal [] 0 (fromRight' res))
+                           in (Right [], newMem, inputList)
     where res = evalNExpr mem nExpr
 --Push Ident Ident --TODO: Repassar be que funcioni amb diferents exemples.
 interpretCommand mem inputList (Push idv idt)
@@ -656,16 +670,17 @@ interpretCommand mem inputList (Pop idv idt)
     where v = value mem idv
 --Split  Ident Ident Ident --TODO: Repassar be que funcioni amb diferents exemples.
 interpretCommand mem inputList (Split idlt idrt idt)
-    | isNothing' t             = (Left undefinedVarErr, mem, inputList)
-    | isEmptyVal $ fromJust' t = (Left noContentErr, mem, inputList)
-    | isTVal $ fromJust' t     = let tlen = lengthTVal $ fromJust' t
-                                     leftLen = tlen - (part2 tlen)
-                                     (tl, tr) = splitTube (fromJust' t) leftLen
-                                     eraseTMem = update mem idt EmptyVal
-                                     tlMem = update eraseTMem idlt tl
-                                     newMem = update tlMem idrt tr
-                                 in (Right [], newMem, inputList)
-    | otherwise                = (Left typeErr, mem, inputList)
+    | isNothing' t                    = (Left undefinedVarErr, mem, inputList)
+    | isEmptyVal $ fromJust' t        = (Left noContentErr, mem, inputList)
+    | not $ isTVal $ fromJust' t      = (Left typeErr, mem, inputList)
+    | (lengthTVal $ fromJust' t) <= 1 = (Left wrongSizeErr, mem, inputList)
+    | otherwise                       = let tlen = lengthTVal $ fromJust' t
+                                            leftLen = tlen - (part2 tlen)
+                                            (tl, tr) = splitTube (fromJust' t) leftLen
+                                            eraseTMem = update mem idt EmptyVal
+                                            tlMem = update eraseTMem idlt tl
+                                            newMem = update tlMem idrt tr
+                                        in (Right [], newMem, inputList)                    
     where t = value mem idt
 
 --concatCommantResults: 
@@ -689,14 +704,14 @@ concatCommantResults p1@(either1, mem, inputList) p2@(either2, newMem, newInputL
 --part2:
 -- Donat un nombre x.
 -- Retorna el nombre sense decimals més gran pel qual el seu doble es menor o igual que x.
-part2 :: (Num a, Ord a) => a -> a -- Implementacio MOLT ineficient, buscar una millor
+part2 :: (Num a, Ord a) => a -> a -- TODO: Implementacio MOLT ineficient, buscar una millor
 part2 x = part2' x 0
 
 --part2':
 -- Donat un nombre x i un nombre m.
 -- Retorna m si el doble d'ell mes 1 es major que x, si no fa una crida recursiva a ella
 -- mateixa amb m + 1.
-part2' :: (Num a, Ord a) => a -> a -> a -- Implementacio MOLT ineficient, buscar una millor
+part2' :: (Num a, Ord a) => a -> a -> a -- TODO: Implementacio MOLT ineficient, buscar una millor
 part2' x m
     | m' * 2 > x = m
     | otherwise  = part2' x m'
@@ -722,6 +737,8 @@ interpretProgram :: (Num a, Ord a) => [a] -> Command a -> (Either String [a])
 interpretProgram inputList cmd = res
     where (res, _, _) = interpretCommand (start :: MemBST a) inputList cmd
 -- Definit aixi, s'ha de canviar manualment si es vol ussar un BST o una llista
+-- o comentar/eliminar una de les instancies de SymTable (i no caldra ja dir quin
+-- estem ussant).
 
 
 -------------------------------------
@@ -769,17 +786,14 @@ fromRight' _         = undefined
 programhs1 :: String
 programhs1 = "programhs1.txt"
 
-
 programhs2 :: String
 programhs2 = "programhs2.txt"
-
 
 readProgram :: FilePath -> IO String
 readProgram file = do ha <- openFile file ReadMode
                       program <- hGetLine ha
                       hClose ha
                       return program
-
 
 uploadProgram :: Read a => FilePath -> IO (Command a)
 uploadProgram fileName = do strPrg <- readProgram fileName
@@ -796,67 +810,138 @@ uploadProgram fileName = do strPrg <- readProgram fileName
 -------------------------------------
 -- P4
 -------------------------------------
+countDiff :: Eq a => [(Either String [a], Either String [a])] -> Integer
+countDiff [] = 0
+countDiff ((res1, res2):sres)
+    | res1 == res2 = countDiff sres
+    | otherwise    = countDiff sres + 1
 
-execManual :: Command a -> Command a -> m a -> IO () -- TODO
-execManual prog1 prog2 mem = do return ()
+sortedListMemDiff :: Show a =>
+    [(String, Val a)] -> [(String, Val a)] -> [(String, String, String)]
+sortedListMemDiff [] [] = []
+sortedListMemDiff ((k,v):sm) [] = [(k, show v, "Nothing")] ++ sortedListMemDiff sm []
+sortedListMemDiff [] ((k,v):sm) = [(k, "Nothing", show v)] ++ sortedListMemDiff [] sm
+sortedListMemDiff p1@((k1,v1):sm1) p2@((k2,v2):sm2)
+    | k1 < k2   = [(k1, show v1, "Nothing")] ++ sortedListMemDiff sm1 p2
+    | k1 > k2   = [(k2, "Nothing", show v2)] ++ sortedListMemDiff p1 sm2
+    | otherwise = [(k1, show v1, show v2)] ++ sortedListMemDiff sm1 sm2
 
+showDiffMem :: (Show a, Num a, Ord a, Show (m a), SymTable m, SymTable' m) =>
+    m a -> m a -> IO ()
+showDiffMem mem1 mem2 = do
+    let slmem1 = sortedListMem mem1
+    let slmem2 = sortedListMem mem2
+    putStrLn $ show $ sortedListMemDiff slmem1 slmem2
 
-execAuto :: Command a -> Command a -> m a -> IO () -- TODO
-execAuto prog1 prog2 mem = do return ()
+showProgramOutput :: Show a => Either String [a] -> IO ()
+showProgramOutput either
+    | isLeft' either = do putStrLn $ fromLeft' either
+    | otherwise = do putStrLn $ show $ fromRight' either
 
+execProgram :: (Num a, Ord a, SymTable m) =>
+    m a -> [a] -> Command a -> ((Either String [a]), m a)
+execProgram mem inputList prog = (res, resMem)
+    where (res, resMem, _) = interpretCommand mem inputList prog
 
-chooseTest :: Command a -> Command a -> m a -> IO ()
-chooseTest prog1 prog2 mem = do putStrLn "- Tria el tipus de test (0 o 1)"
-                                putStrLn "  0 - Test comparatiu manual"
-                                putStrLn "  1 - Test comparatiu automatic"
-                                n <- readLn
-                                if n == 0
-                                then do putStrLn "Has triat test comparatiu manual (0)"
-                                        let mem = (start :: MemList a)
-                                        execManual prog1 prog2 mem
-                                else if n == 1
-                                then do putStrLn "Has triat test comparatiu automatic (1)"
-                                        let mem = (start :: MemBST a)
-                                        execAuto prog1 prog2 mem
-                                else do putStrLn "Has d'introduir 0 o 1"
-                                        chooseMem prog1 prog2
+generateExecution :: (Random a, Show a, Num a, Ord a, Show (m a), SymTable m, SymTable' m) =>
+    [a] -> Command a -> Command a -> m a -> IO (Either String [a], Either String [a])
+generateExecution inputList prog1 prog2 mem = do
+    g <- newStdGen
+    let randomList = (randomRs (1, 10) g :: (Num a, Random a) => [a])
+    let execInputList = inputList ++ randomList
+    let (res1, resMem1) = execProgram mem execInputList prog1
+    let (res2, resMem2) = execProgram mem execInputList prog2
+    putStrLn "- Resultats del primer programa: "
+    showProgramOutput res1
+    putStrLn "- Resultats del segon programa: "
+    showProgramOutput res2
+    putStrLn "- Diferencies entre les memories dels dos programes."
+    putStrLn "  (en cas de no existir la variable, Nothing)"
+    showDiffMem resMem1 resMem2
+    return (res1, res2)
 
+execAutoKTimes :: (Random a, Show a, Num a, Ord a, Show (m a), SymTable m, SymTable' m) =>
+    Integer -> Integer -> Command a -> Command a ->
+    m a -> IO [(Either String [a], Either String [a])]
+execAutoKTimes _ 0 _ _ _ = do return []
+execAutoKTimes n k prog1 prog2 mem = do
+    putStrLn $ "Executant test " ++ (show n)
+    (res1, res2) <- generateExecution [] prog1 prog2 mem
+    putStrLn $ replicate 24 '-' ++ "\n"
+    nextItRes <- execAutoKTimes (n + 1) (k - 1) prog1 prog2 mem
+    return $ (res1, res2):nextItRes
 
-chooseMem :: Command a -> Command a -> IO ()
-chooseMem prog1 prog2 = do putStrLn "- Tria el tipus de memoria (0 o 1)"
-                           putStrLn "  0 - llista"
-                           putStrLn "  1 - arbre binari de cerca (BST)"
-                           n <- readLn
-                           if n == 0
-                           then do putStrLn "Has triat llista (0)"
-                                   let mem = (start :: MemList a)
-                                   chooseTest prog1 prog2 mem
-                           else if n == 1
-                           then do putStrLn "Has triat BST (1)"
-                                   let mem = (start :: MemBST a)
-                                   chooseTest prog1 prog2 mem
-                           else do putStrLn "Has d'introduir 0 o 1"
-                                   chooseMem prog1 prog2
+execAuto :: (Random a, Read a, Show a, Num a, Ord a, Show (m a), SymTable m, SymTable' m) =>
+    Command a -> Command a -> m a -> IO () -- TODO
+execAuto prog1 prog2 mem = do
+    putStrLn $ "- Tria quans testos diferents vols passar"
+    k <- (readLn :: IO Integer)
+    results <- execAutoKTimes 1 k prog1 prog2 mem
+    putStrLn "- Execucions que han donat resultats diferents"
+    putStrLn "  entre el primer i segon programa"
+    putStrLn $ show $ countDiff results
 
+execManual :: (Random a, Read a, Show a, Num a, Ord a, Show (m a), SymTable m, SymTable' m) =>
+    String -> Command a -> Command a -> m a -> IO ()
+execManual numType prog1 prog2 mem = do
+    putStrLn $ "- Introdueix una llista (" ++ numType ++ ")"
+    putStrLn "  exemple: [2,3,5]"
+    inputList <- (readLn :: Read a => IO [a])
+    generateExecution inputList prog1 prog2 mem
+    return ()
+
+chooseTest :: (Random a, Read a, Show a, Num a, Ord a, Show (m a), SymTable m, SymTable' m) =>
+    String -> Command a -> Command a -> m a -> IO ()
+chooseTest numType prog1 prog2 mem = do
+    putStrLn "- Tria el tipus de test (0 o 1)"
+    putStrLn "  0 - Test comparatiu manual"
+    putStrLn "  1 - Test comparatiu automatic"
+    n <- readLn
+    if n == 0
+    then do putStrLn "Has triat test comparatiu manual (0)"
+            execManual numType prog1 prog2 mem
+    else if n == 1
+    then do putStrLn "Has triat test comparatiu automatic (1)"
+            execAuto prog1 prog2 mem
+    else do putStrLn "Has d'introduir 0 o 1"
+            chooseTest numType prog1 prog2 mem
+
+chooseMem :: (Random a, Read a, Show a, Num a, Ord a) =>
+    String -> Command a -> Command a -> IO ()
+chooseMem numType prog1 prog2 = do
+    putStrLn "- Tria el tipus de memoria (0 o 1)"
+    putStrLn "  0 - llista"
+    putStrLn "  1 - arbre binari de cerca (BST)"
+    n <- readLn
+    if n == 0
+    then do putStrLn "Has triat llista (0)"
+            let mem = (start :: MemList a)
+            chooseTest numType prog1 prog2 mem
+    else if n == 1
+    then do putStrLn "Has triat BST (1)"
+            let mem = (start :: MemBST a)
+            chooseTest numType prog1 prog2 mem
+    else do putStrLn "Has d'introduir 0 o 1"
+            chooseMem numType prog1 prog2
 
 chooseNumType :: IO ()
-chooseNumType = do putStrLn "- Tria el tipus de valors numerics (0 o 1)"
-                   putStrLn "  0 - enters"
-                   putStrLn "  1 - reals"
-                   n <- readLn
-                   if n == 0
-                   then do putStrLn "Has triat enters (0)"
-                           prog1 <- (uploadProgram programhs1 :: IO (Command Integer))
-                           prog2 <- (uploadProgram programhs2 :: IO (Command Integer))
-                           chooseMem prog1 prog2
-                   else if n == 1
-                   then do putStrLn "Has triat reals (1)"
-                           prog1 <- (uploadProgram programhs1 :: IO (Command Double))
-                           prog2 <- (uploadProgram programhs2 :: IO (Command Double))
-                           chooseMem prog1 prog2
-                   else do putStrLn "Has d'introduir 0 o 1"
-                           chooseNumType
-
+chooseNumType = do
+    putStrLn "- Tria el tipus de valors numerics (0 o 1)"
+    putStrLn "  0 - enters"
+    putStrLn "  1 - reals"
+    n <- readLn
+    if n == 0
+    then do putStrLn "Has triat enters (0)"
+            prog1 <- (uploadProgram programhs1 :: IO (Command Integer))
+            prog2 <- (uploadProgram programhs2 :: IO (Command Integer))
+            chooseMem "enters" prog1 prog2
+    else if n == 1
+    then do putStrLn "Has triat reals (1)"
+            prog1 <- (uploadProgram programhs1 :: IO (Command Double))
+            prog2 <- (uploadProgram programhs2 :: IO (Command Double))
+            chooseMem "reals" prog1 prog2
+    else do putStrLn "Has d'introduir 0 o 1"
+            chooseNumType
 
 
 -------------------------------------
@@ -870,3 +955,12 @@ chooseNumType = do putStrLn "- Tria el tipus de valors numerics (0 o 1)"
 -------------------------------------
 
 main = chooseNumType
+
+
+
+
+
+
+
+-- TODO: 
+-- Tubs / connectors / vectors amb mides <= 0 -> llençar errors!!
