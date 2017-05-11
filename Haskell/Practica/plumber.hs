@@ -704,14 +704,14 @@ concatCommantResults p1@(either1, mem, inputList) p2@(either2, newMem, newInputL
 --part2:
 -- Donat un nombre x.
 -- Retorna el nombre sense decimals més gran pel qual el seu doble es menor o igual que x.
-part2 :: (Num a, Ord a) => a -> a -- TODO: Implementacio MOLT ineficient, buscar una millor
+part2 :: (Num a, Ord a) => a -> a
 part2 x = part2' x 0
 
 --part2':
 -- Donat un nombre x i un nombre m.
 -- Retorna m si el doble d'ell mes 1 es major que x, si no fa una crida recursiva a ella
 -- mateixa amb m + 1.
-part2' :: (Num a, Ord a) => a -> a -> a -- TODO: Implementacio MOLT ineficient, buscar una millor
+part2' :: (Num a, Ord a) => a -> a -> a
 part2' x m
     | m' * 2 > x = m
     | otherwise  = part2' x m'
@@ -810,11 +810,12 @@ uploadProgram fileName = do strPrg <- readProgram fileName
 -------------------------------------
 -- P4
 -------------------------------------
-countDiff :: Eq a => [(Either String [a], Either String [a])] -> Integer
-countDiff [] = 0
-countDiff ((res1, res2):sres)
-    | res1 == res2 = countDiff sres
-    | otherwise    = countDiff sres + 1
+
+countDiffInTuple :: Eq a => [(Either String [a], Either String [a])] -> Integer
+countDiffInTuple [] = 0
+countDiffInTuple ((res1, res2):sres)
+    | res1 == res2 = countDiffInTuple sres
+    | otherwise    = countDiffInTuple sres + 1
 
 sortedListMemDiff :: Show a =>
     [(String, Val a)] -> [(String, Val a)] -> [(String, String, String)]
@@ -876,10 +877,12 @@ execAuto :: (Random a, Read a, Show a, Num a, Ord a, Show (m a), SymTable m, Sym
 execAuto prog1 prog2 mem = do
     putStrLn $ "- Tria quans testos diferents vols passar"
     k <- (readLn :: IO Integer)
+    putStrLn "\n"
     results <- execAutoKTimes 1 k prog1 prog2 mem
     putStrLn "- Execucions que han donat resultats diferents"
-    putStrLn "  entre el primer i segon programa"
-    putStrLn $ show $ countDiff results
+    putStrLn "  entre el primer i segon programa\n"
+    putStrLn $ show $ countDiffInTuple results
+    putStrLn "\n"
 
 execManual :: (Random a, Read a, Show a, Num a, Ord a, Show (m a), SymTable m, SymTable' m) =>
     String -> Command a -> Command a -> m a -> IO ()

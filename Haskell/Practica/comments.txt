@@ -1,16 +1,34 @@
 Dubtes:
 
+
 PRACTICA HASKELL
+
+-> Script.. en que? bash idc
+
 -> Tubs/Vector/conector: valors menors a 0??? Fer saltar error¿?
-   Tubs mida 1 (split)? Tubs mida menor a 1??? Tubs mida 0....????
+   Tubs mida 1 (split)? Tubs mida menor a 1??? Tubs mida 0....???? -> idc
 
 -> Test auto: "s’indicarà al final el nombre de test que han donat llistes
 de sortida diferents (no importa si han tingut la memòria diferent).""
 Aixo que vol dir?...
 
+-> Variables "empty" o eliminarles? -> empty
+
+-> Input prog1 i prog2, la part generada aleatoriament ha de ser la mateixa o diferents 
+parts aleatories per cada un? -> prog1 contra prog2
+
+
+-> al script no compilar plumber.g, supossar que existeix ja el executable (./plumber)
+
+
+
+-> comparar / obtener tipo / kind de variable
+
+
+
 
 PYTHON
-no ++ i --... perque?
+no ++ i -- ... perque?
 
 
 
