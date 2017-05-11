@@ -963,4 +963,4 @@ main = chooseNumType
 
 
 -- TODO: 
--- Tubs / connectors / vectors amb mides <= 0 -> llençar errors!!
+-- Tubs / connectors / vectors amb mides <= 0 -> llençar errors!! <- comprovar que funciona
