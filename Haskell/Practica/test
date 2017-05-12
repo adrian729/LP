@@ -1,0 +1,48 @@
+#!/bin/bash
+
+clear
+
+echo ""
+echo "start script"
+
+## Errors
+# comprovem existeix plumber
+if ! [ -f plumber ]; then
+	echo ""
+	echo "error: file \"plumber\" does not exist"
+	echo ""
+	exit 1
+fi
+# comprovem tenim dos parametres
+if [ $# -lt 2 ]; then
+	echo ""
+	echo "error: test needs two parameters"
+	echo ""
+	exit 1
+fi
+# algun dels parametres no es un fitxer
+if ! [ -f $1 -a -f $2 ]; then
+	echo ""
+	echo "error: test needs two filenames as parameters"
+	echo ""
+	exit 1
+fi
+## Script body
+
+prog1=$1
+prog2=$2
+
+echo ""
+echo "correct parameters and requisites"
+./plumber < ${prog1} > programhs1.txt || (echo "Problem making programhs1!!" && exit 1)
+echo "programhs1.txt done"
+./plumber < ${prog2} > programhs2.txt || (echo "Problem making programhs2!!" && exit 1)
+echo "programhs2.txt done"
+echo ""
+echo "all right!"
+echo ""
+
+# ghc program.hs -v
+
+echo "end script"
+echo ""

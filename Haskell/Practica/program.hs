@@ -608,7 +608,7 @@ interpretCommand mem inputList (Draw tExpr)
     | otherwise   = let TVal len diam = fromRight' res
                     in (Right $ [diam] ++ len, mem, inputList)
     where (res, _) = evalTExpr mem tExpr
---Seq [Command a] --TODO: Repassar be que funcioni amb diferents exemples.
+--Seq [Command a]
 interpretCommand mem inputList (Seq []) = (Right [], mem, inputList)
 interpretCommand mem inputList (Seq (cmd:sCmd))
     | isLeft' cmdEither = (cmdEither, mem, inputList)
@@ -616,7 +616,7 @@ interpretCommand mem inputList (Seq (cmd:sCmd))
                               resCmd = (cmdEither, newMem, newInputList)
                           in concatCommantResults resCmd resSeqTail
     where (cmdEither, newMem, newInputList) = interpretCommand mem inputList cmd
---Cond (BExpr a) (Command a) (Command a) --TODO: Repassar be que funcioni amb diferents exemples.
+--Cond (BExpr a) (Command a) (Command a)
 interpretCommand mem inputList (Cond bExpr cmd1 cmd2)
     | isLeft' res    = (Left $ fromLeft' res, mem, inputList)
     | fromRight' res = interpretCommand mem inputList cmd1
@@ -958,10 +958,6 @@ chooseNumType = do
 -------------------------------------
 
 main = chooseNumType
-
-
-
-
 
 
 
