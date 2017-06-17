@@ -7,7 +7,7 @@ sock = urllib.request.urlopen("http://www.bcn.cat/tercerlloc/agendaAvui.xml")
 xmlSource = sock.read()                            
 sock.close()
 
-#print(xmlSource)                              
+#print(xmlSource)
 
 root = ET.fromstring(xmlSource)
 

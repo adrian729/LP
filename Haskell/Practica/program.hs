@@ -622,7 +622,7 @@ interpretCommand mem inputList (Cond bExpr cmd1 cmd2)
     | fromRight' res = interpretCommand mem inputList cmd1
     | otherwise      = interpretCommand mem inputList cmd2
     where res = evalBExpr mem bExpr
---Loop (BExpr a) (Command a) --TODO: Repassar be que funcioni amb diferents exemples.
+--Loop (BExpr a) (Command a)
 interpretCommand mem inputList (Loop bExpr cmd)
     | isLeft' bRes              = (Left $ fromLeft' bRes, mem, inputList)
     | not $ fromRight' bRes     = (Right [], mem, inputList)
@@ -633,14 +633,14 @@ interpretCommand mem inputList (Loop bExpr cmd)
           in  concatCommantResults resCmd resNextIt
     where bRes = evalBExpr mem bExpr
           (eitherCmd, newMem, newInputList) = interpretCommand mem inputList cmd
---DeclareVector Ident (NExpr a) --TODO: Repassar be que funcioni amb diferents exemples.
+--DeclareVector Ident (NExpr a)
 interpretCommand mem inputList (DeclareVector id nExpr)
     | isLeft' res        = (Left $ fromLeft' res, mem, inputList)
     | fromRight' res < 1 = (Left $ wrongSizeErr, mem, inputList)
     | otherwise          = let newMem = update mem id (VTVal [] 0 (fromRight' res))
                            in (Right [], newMem, inputList)
     where res = evalNExpr mem nExpr
---Push Ident Ident --TODO: Repassar be que funcioni amb diferents exemples.
+--Push Ident Ident
 interpretCommand mem inputList (Push idv idt)
     | isNothing' v || isNothing' t  = (Left undefinedVarErr, mem, inputList)
     | (isEmptyVal $ fromJust' v) || (isEmptyVal $ fromJust' t)
@@ -655,7 +655,7 @@ interpretCommand mem inputList (Push idv idt)
                                       in (Right [], newMem, inputList)
     where v = value mem idv
           t = value mem idt
---Pop Ident Ident --TODO: Repassar be que funcioni amb diferents exemples.
+--Pop Ident Ident
 interpretCommand mem inputList (Pop idv idt)
     | isNothing' v                = (Left undefinedVarErr, mem, inputList)
     | isEmptyVal $ fromJust' v    = (Left noContentErr, mem, inputList)
@@ -668,7 +668,7 @@ interpretCommand mem inputList (Pop idv idt)
                                         newMem = update mem idt newTube
                                       in (Right [], newMem, inputList)
     where v = value mem idv
---Split  Ident Ident Ident --TODO: Repassar be que funcioni amb diferents exemples.
+--Split  Ident Ident Ident
 interpretCommand mem inputList (Split idlt idrt idt)
     | isNothing' t                    = (Left undefinedVarErr, mem, inputList)
     | isEmptyVal $ fromJust' t        = (Left noContentErr, mem, inputList)
@@ -873,7 +873,7 @@ execAutoKTimes n k prog1 prog2 mem = do
     return $ (res1, res2):nextItRes
 
 execAuto :: (Random a, Read a, Show a, Num a, Ord a, Show (m a), SymTable m, SymTable' m) =>
-    Command a -> Command a -> m a -> IO () -- TODO
+    Command a -> Command a -> m a -> IO ()
 execAuto prog1 prog2 mem = do
     putStrLn $ "- Tria quans testos diferents vols passar"
     k <- (readLn :: IO Integer)
@@ -958,8 +958,3 @@ chooseNumType = do
 -------------------------------------
 
 main = chooseNumType
-
-
-
--- TODO: 
--- Tubs / connectors / vectors amb mides <= 0 -> llençar errors!! <- comprovar que funciona
