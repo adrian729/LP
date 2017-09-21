@@ -75,23 +75,12 @@ primeDivisors n = primeDivisors2 n 2
 primeDivisors2 :: Int -> Int -> [Int]
 primeDivisors2 n d
     | n == 1              = []
-    | m == 0 && isPrime d = d : (primeDivisors2 (divAll n d) (d + 1))
+    | m == 0              = d : (primeDivisors2 (divAll n d) (d + 1))
     | otherwise           = primeDivisors2 n (d + 1)
     where m = mod n d
 
 divAll :: Int -> Int -> Int
 divAll n d
-    | m > 0     = n    
+    | m > 0     = n
     | otherwise = divAll (div n d) d
     where m = mod n d
-
-isPrime :: Int -> Bool
-isPrime n
-    | n < 2     = False
-    | otherwise = isPrimeRec n 2
-
-isPrimeRec :: Int -> Int -> Bool
-isPrimeRec n m
-    | m * m > n      = True
-    | (mod n m) == 0 = False
-    | otherwise      = isPrimeRec n (m + 1)

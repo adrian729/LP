@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Practica LP - Python</title>
+	</head>
+	<body>
+		<table style="width:100%">
+			<tr style="border-bottom: 2em solid red;">
+				<th>name</th>
+				<th>address</th>
+				<th>content</th>
+				<th>stations with slots</th>
+				<th>stations with bikes</th>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Plaça Eivissa</td>
+				<td style="border: 1px solid black">Pl Eivissa 1</td>
+				<td style="border: 1px solid black"><p>Punt de trobada dels veïns, la plaça d’Eivissa és una agradable àrea d’esbarjo al cor mateix de l’antic poble d’Horta. Prendre la fresca a l’ombra dels plàtans, llegir el diari en una terrassa o apropar-se al Quimet d’Horta a fer un entrepà són alguns dels petits grans plaers que ofereix aquest espai tranquil i familiar.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Pla de Montbau</td>
+				<td style="border: 1px solid black">Pla Montbau 6</td>
+				<td style="border: 1px solid black"><p>El barri de Montbau es va construir durant la dècada dels cinquanta i el pla de Montbau es va dissenyar seguint els preceptes de l’arquitectura racionalista emergent: és un espai funcional concebut com a lloc de trobada del nou barri d’habitatges, aixecat en ple franquisme, quan Josep Maria de Porcioles era l’alcalde de la ciutat. </p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Plaça del Nen de la Rutlla</td>
+				<td style="border: 1px solid black">Pl Nen de la Rutlla 9999</td>
+				<td style="border: 1px solid black"><p>Fins fa pocs anys la plaça duia el nom de Francesc Puig i Alfonso, regidor de l’Ajuntament de Barcelona que va promoure nombroses iniciatives culturals i socials a la ciutat. L’any 1961 s’hi va instal·lar El nen de la rutlla, l’escultura d’estil noucentista que es va convertir en emblema del Guinardó. Per això, el 2001 es va canviar el nom de la plaça per l’actual: plaça del Nen de la Rutlla.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Masia de Can Baró</td>
+				<td style="border: 1px solid black">Pl Can Baró 1</td>
+				<td style="border: 1px solid black"><p>El nom d’aquesta masia prové del fet que el seu propietari, Josep Pascual de Pascali, va rebre el títol de baró de Sant Lluís al segle XVIII, quan era ambaixador de l’Estat a Suïssa. La casa es conserva a la plaça que duu el mateix nom. Antigament, estava envoltada d’extensos terrenys, que van ser expropiats a favor de la Societat General d’Aigües de Barcelona. Ara, és la seu de l’escola Artur Martorell. </p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Facultat de Ciències de la Salut Blanquerna - URL</td>
+				<td style="border: 1px solid black">C Padilla 326</td>
+				<td style="border: 1px solid black"><p>La Facultat de Ciències de la Salut Blanquerna ofereix estudis de grau, màster i postgrau, a més d’impulsar la recerca des d’un punt de vista humanístic. El centre potencia la mobilitat internacional dels estudiants i rep estudiants estrangers. </p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Parc de la Ciutadella</td>
+				<td style="border: 1px solid black">Pg Picasso 21</td>
+				<td style="border: 1px solid black"><p>La Ciutadella de Barcelona va ser una fortalesa militar que es va aixecar entre els anys 1716 i 1725, després de la victòria borbònica sobre els catalans en la guerra de Successió, amb l’objectiu de controlar i reprimir la població barcelonina. Després de nombroses peticions, el 1869 se'n va començar l'enderrocament, i el solar es va destinar a una gran zona verda: naixia el parc de la Ciutadella.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Mercat d'Horta</td>
+				<td style="border: 1px solid black">C Tajo 75</td>
+				<td style="border: 1px solid black"><p>Amb una història que es remunta a l’any 1886, quan es van començar a instal·lar 26 paradetes a la plaça d’Eivissa, el Mercat d’Horta ha estat al llarg dels anys un punt d’unió de tots els comerços del barri. L’expansió i la transformació en un mercat cobert no han fet canviar les relacions de proximitat entre client i venedor, així com l’oferta d’un producte de qualitat a preu just.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">El Parc del Fòrum</td>
+				<td style="border: 1px solid black">Pl Fòrum 1</td>
+				<td style="border: 1px solid black"><p>Memòria del Fòrum Universal de les Cultures celebrat a Barcelona l’any 2004, obert al mar i amb el teló de fons de la nova Diagonal Mar, el parc del Fòrum és un gran recinte que s’ha convertit en lloc de trobada i punt de celebració de múltiples esdeveniments, gràcies a la seva accessibilitat, versatilitat i capacitat per rebre multituds.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Cementiri Sant Genís</td>
+				<td style="border: 1px solid black">Saldes 3</td>
+				<td style="border: 1px solid black"><p>El cementiri és al costat de l'església de Sant Genís dels Agudells. Disposa d’un miler de nínxols, en un dels quals hi va estar enterrat Manuel Carrasco i Formiguera, militant d’Unió Democràtica de Catalunya, afusellat a Burgos el 1938, i que ara reposa al cementiri de Montjuïc. Avui, el complex parroquial de Sant Genís dels Agudells està catalogat com a conjunt historicoartístic. </p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Parc Carmel</td>
+				<td style="border: 1px solid black">Ctra Carmel 9999</td>
+				<td style="border: 1px solid black"><p>Una part del parc duu el nom de jardins de Juan Ponce, en honor al veí Juan Ponce Perujo (1905-1989), que va aconseguir moltes millores per al barri. També hi ha un casal d’avis, una àrea de jocs infantils i pistes de petanca. I al centre del parc hi ha l’obra L’ordre d’avui és el desordre de demà (1999), de l’escultor escocès Ian Hamilton Finlay, feta amb pedra procedent de Montjuïc. </p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Cementiri d'Horta</td>
+				<td style="border: 1px solid black">Pl Cementiri d'Horta 9</td>
+				<td style="border: 1px solid black"><p>Amb uns 3.700 metres quadrats i poc més de 1.300 sepultures, està dividit en quatre illes d’extensió similar. A banda i banda del passadís central, flanquejat per pins i xiprers, hi ha els panteons i les tombes més importants, alguns dels quals mostren escuts heràldics i epitafis que indiquen el títol nobiliari del difunt. En el perímetre del cementiri hi ha els 1.236 nínxols. </p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Els Tres Turons</td>
+				<td style="border: 1px solid black">Ctra Carmel 9999</td>
+				<td style="border: 1px solid black"><p>Els Tres Turons permeten veure des de les altures tots els barris de Barcelona que s’estenen cap al mar. Formats pels turons del Coll, el Carmel i la Rovira, ofereixen les millors vistes de la ciutat i una barreja poc comuna entre urbanisme i natura. La bateria antiaèria del turó de la Rovira, el parc del Guinardó, el parc de la Creueta del Coll... Els espais creats dins dels Tres Turons ofereixen tranquil·litat i verdor dins de la ciutat.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">El Campus Mundet - UB</td>
+				<td style="border: 1px solid black">Pg Vall d'Hebron 173</td>
+				<td style="border: 1px solid black"><p>Ubicat al recinte de les antigues Llars Mundet, de tradició humanitària, el Campus Mundet es troba en un entorn natural que comprèn sis hectàrees de bosc. Rodejat de riquesa històrica i natural, el campus integra les facultats de Psicologia, Pedagogia i Professorat de la Universitat de Barcelona (UB), i a més té equipaments esportius, socials i culturals de gran rellevància a Barcelona.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Jardins del Príncep de Girona</td>
+				<td style="border: 1px solid black">C Marina 372</td>
+				<td style="border: 1px solid black"><p>On ara hi ha aquests jardins hi va haver, fins a principis dels anys vuitanta, els antics quarters de cavalleria de Girona. Els jardins ocupen el que era el pati central i es conserva encara part de l’antiga caserna militar, avui seu de diferents serveis del districte. </p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Casa de les Altures</td>
+				<td style="border: 1px solid black">Rda Guinardó 49</td>
+				<td style="border: 1px solid black"><p>Construïda a finals del segle XIX com a residència del director de la Societat General d’Aigües, el fet d’estar ubicada molt a prop dels motors d’elevació d’aquesta companyia va valer a l’edifici el nom de Casa de les Altures. Actualment, i des de fa 25 anys, funciona com a seu del Districte d’Horta-Guinardó.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">El nucli antic d'Horta</td>
+				<td style="border: 1px solid black">C Fulton 15</td>
+				<td style="border: 1px solid black"><p>Petites cases baixes i carrerons, tranquil·litat i fins i tot silenci. Al nucli antic del barri d’Horta els veïns i veïnes han sabut conservar l’ambient de poble que el barri sempre ha tingut. La plaça d'Eivissa és el centre d’aquest petit nucli antic i el focus de la vida social del barri, i uneix la xarxa de carrers amb més història. Els passejos tranquils i la cuina tradicional són tot un plaer en aquest punt d’Horta-Guinardó.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Masia Can Fargas</td>
+				<td style="border: 1px solid black">Pg Maragall 383</td>
+				<td style="border: 1px solid black"><p>Declarada Bé Cultural d’Interès Nacional, l’origen de la Masia de Can Fargues és una torre defensiva que data del segle XII. Amb el pas del temps, la fortalesa va anar creixent i es va adaptar progressivament als nous temps, fins a quedar transformada en un important nucli agrícola. La torre, però, es va conservar gairebé intacta, i encara es pot veure integrada a la part central de la masia.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Sant Pau Recinte Modernista</td>
+				<td style="border: 1px solid black">C Sant Antoni Maria Claret 167</td>
+				<td style="border: 1px solid black"><p>Un dels centres sanitaris més importants de Barcelona i un cabdal del modernisme, l’Hospital de Sant Pau, declarat Patrimoni Mundial per la UNESCO, trasllada el visitant a una comunió entre arquitectura i història que no deixa indiferent. Obra de l’arquitecte Lluís Domènech i Montaner, el Recinte Modernista s’ha convertit en un nou espai de referència de la ciutat de Barcelona, un espai en el qual conviuen història i innovació.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Restaurant Can Cortada</td>
+				<td style="border: 1px solid black">Av Estatut de Catalunya 88</td>
+				<td style="border: 1px solid black"><p>Declarada Bé Cultural d’Interès Local, la Masia de Can Cortada va començar la seva història sent un castell medieval, propietat dels senyors d’Horta. Amb el temps, el castell va perdre la funció defensiva en favor de l’activitat agrícola i, al segle XVI, havia esdevingut una de les masies més productives d’Horta. Joan Baptista Cortada la va comprar l’any 1711 i li va donar el nom actual.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Centre Cívic Guinardó</td>
+				<td style="border: 1px solid black">Rda Guinardó 113</td>
+				<td style="border: 1px solid black"><p>El Centre Cívic del Guinardó, que va ser el primer de tot Barcelona, és un lloc de trobada on s’organitzen tot tipus d’activitats: tallers, exposicions, representacions teatrals, concerts, conferències. El centre també posa a disposició dels veïns sales per treballar i assajar, una aula d’informàtica i altres recursos gratuïts.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Museu Palmero Arte</td>
+				<td style="border: 1px solid black">Judea 2</td>
+				<td style="border: 1px solid black"><p>El museu conserva una col·lecció permanent que consta de 125 pintures fetes pel pintor Maestro Palmero i que giren entorn de diverses escenes aparegudes a l’obra mestra de l’escriptor Miguel de Cervantes, El Quixot.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Hospital Universitari de la Vall d'Hebron</td>
+				<td style="border: 1px solid black">Pg Vall d'Hebron 119</td>
+				<td style="border: 1px solid black"><p>Ubicada al barri de Montbau, la Ciutat Sanitària Vall d’Hebron disposa de l’Hospital Universitari Vall d’Hebron, de referència nacional, així com de la Fundació de Recerca Biomèdica i Docència, associada a la Universitat Autònoma de Barcelona. Tant l’hospital com el centre d’investigació tenen un gran prestigi dins i fora d’Europa.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Parròquia de Sant Genís dels Agudells</td>
+				<td style="border: 1px solid black">C Saldes 3</td>
+				<td style="border: 1px solid black"><p>Al segle XIV, l’església de Sant Genís dels Agudells va passar a dependre del monestir de Sant Jeroni de la Vall d’Hebron i, anys més tard, al segle XIX, de la parròquia de Sant Joan d’Horta. Al costat de l’església encara es conserva un cementiri, l’únic que queda dins el nucli urbà de la ciutat i que no depèn de l’Ajuntament. </p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Federació de Comerç Cor d'Horta i Mercat</td>
+				<td style="border: 1px solid black">Pl Eivissa 6</td>
+				<td style="border: 1px solid black"><p>L’any 2000 es va crear la Federació de Comerç Cor d’Horta i Mercat per potenciar el comerç del barri. L’entitat promou iniciatives com ara la Fira de Tardor, la Campanya de Nadal i la Targeta de Client. Horta és un lloc idoni per passejar i gaudir d’un teixit comercial actiu, amb botigues de roba, perfumeries, llibreries, tot tipus de serveis i nombrosos restaurants. </p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Pavelló de la República</td>
+				<td style="border: 1px solid black">C Jorge Manrique 9</td>
+				<td style="border: 1px solid black"><p>Amb un valor molt important per a l’avantguarda del principi del segle XX, el desaparegut Pavelló de la República es va tornar a edificar amb motiu dels Jocs Olímpics del 1992. Aquest emblemàtic edifici és avui dia una biblioteca de la Universitat de Barcelona amb un fons especialitzat en història espanyola des de la Segona República fins a la transició.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Escultura Mistos</td>
+				<td style="border: 1px solid black">Jorge Manrique 9</td>
+				<td style="border: 1px solid black"><p>Els artistes Claes Oldenburg i Coosje van Bruggen van escollir un objecte quotidià per a aquesta escultura. Els mistos surten desordenadament d’una capsa; un està encès amb una flama blava, mentre d’altres estan escampats per terra. L’escultura, d’acer i pintada en acrílic, decora, des del 1992, la que va ser Zona Olímpica de la Vall d’Hebron durant els Jocs de Barcelona.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Museu de Carruatges del Foment</td>
+				<td style="border: 1px solid black">Pl Josep Pallach 8</td>
+				<td style="border: 1px solid black"><p>De càrrega, de passeig, de gala. El Museu de Carruatges ubicat a la Vall d’Hebron conserva 46 carros de tot tipus, que en altres temps havien estat transports indispensables a la ciutat. Reunits per la família Piera, ofereixen un passeig històric per aquest mitjà de transport que recorre des del segle XIX fins als anys setanta del segle XX.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Residència Salesiana Martí Codolar</td>
+				<td style="border: 1px solid black">Av Cardenal Vidal i Barraquer 15</td>
+				<td style="border: 1px solid black"><p>Masia rural, palau residencial, zoològic, seminari... Les múltiples facetes de la històrica Granja Vella de Martí Codolar, i els seus terrenys, són una mostra de l’evolució del districte d’Horta-Guinardó al llarg del temps. A més, la barreja d’estils estètics que acumulen les parets de l’edifici l’han convertit en una joia arquitectònica protegida com a Bé d’Interès Cultural Local.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Residència Assistida per a Gent Gran Llars Mundet</td>
+				<td style="border: 1px solid black">Pg Vall d'Hebron 171</td>
+				<td style="border: 1px solid black"><p>Molt a prop del parc del Laberint d’Horta, al barri de Montbau, es troba l’espai de les Llars Mundet, amb gairebé 14 hectàrees de superfície, sis de les quals són de bosc. Dedicat plenament al servei dels ciutadans, a més del recinte universitari inclou espais assistencials per a la gent gran, centres esportius per a persones discapacitades i centres educatius per als més petits.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Casal de Barri Font d'en Fargues</td>
+				<td style="border: 1px solid black">C Pedrell 67</td>
+				<td style="border: 1px solid black"><p>L’equipament, emplaçat en un edifici històric i emblemàtic del barri de la Font d’en Fargues, l’origen del qual es remunta al 1928, va ser adquirit per l’Ajuntament l’any 2008 amb la voluntat d’oferir un equipament públic per al barri i donar resposta a la reivindicació veïnal. Un cop reformat, va tornar a obrir les portes com a casal de barri el setembre del 2011.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Hospital de la Santa Creu i Sant Pau</td>
+				<td style="border: 1px solid black">C Sant Quintí 89</td>
+				<td style="border: 1px solid black"><p>L’any 2000 es van començar les obres del que és el tercer emplaçament de l’Hospital de la Santa Creu i Sant Pau: el nou hospital ocupa la part nord del Recinte Modernista de Sant Pau, a la cantonada dels carrers de Mas Casanovas i Sant Quintí. </p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Parc de Montjuïc</td>
+				<td style="border: 1px solid black">Pg Migdia 147</td>
+				<td style="border: 1px solid black"><p>Montjuïc és un dels pulmons verds de la ciutat de Barcelona i un dels seus millors miradors. El petit món que reuneix història, jardins, museus, equipaments culturals i instal·lacions olímpiques el converteixen en un lloc únic. L’imponent turó que ocupa des del barri de Sants mira cap al port i ofereix un paisatge impressionant de la ciutat.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Parc de les Rieres d'Horta</td>
+				<td style="border: 1px solid black">Av Estatut de Catalunya 21</td>
+				<td style="border: 1px solid black"><p>Natura, innovació i tecnologia al servei del medi ambient conflueixen en l'acabat d'inaugurar parc de les Rieres d’Horta, que ocupa la zona per on passava l’aigua dels torrents que baixaven de Collserola. Modern i sostenible, el parc té una xarxa d’enllumenat ecoeficient i un recorregut botànic adaptat al terreny i al clima que permet descobrir nombroses espècies mediterrànies.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Jardins del Palau de les Heures</td>
+				<td style="border: 1px solid black">Pg Vall d'Hebron 171</td>
+				<td style="border: 1px solid black"><p>Els jardins del Palau de les Heures són uns jardins d’estil renaixentista que envolten l’antic palau, avui dia convertit en fundació universitària. Ple d’escultures, brolladors i estanys, el seu valor i bellesa fan d’aquest racó un dels millors indrets de descans i pau del districte d’Horta-Guinardó.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Casal d'Entitats Mas Guinardó</td>
+				<td style="border: 1px solid black">Pl Salvador Riera 2</td>
+				<td style="border: 1px solid black"><p>Promoure la convivència entre veïns, dinamitzar les iniciatives locals i fomentar les activitats solidàries i culturals al barri són alguns dels objectius del Casal d’Entitats Mas Guinardó. Nascut l’any 2011, el casal ocupa una masia que té més de sis-cents anys on s’organitzen cursos i tallers, activitats relacionades amb l’hort i trobades d’associacions i de grups de treball de diferents àmbits.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Escultura David i Goliat Homenatge a les Brigades Internacionals</td>
+				<td style="border: 1px solid black">Rbla Carmel 46</td>
+				<td style="border: 1px solid black"><p>Les Brigades Internacionals van ser unitats militars formades per voluntaris de diversos països del món que van venir a Espanya a lluitar a favor de la República durant la Guerra Civil. El 1938, a causa de la pressió internacional, es van retirar del conflicte. El Govern de la República els va organitzar un comiat multitudinari. Aquest monument els ret homenatge. </p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">El Túnel de la Rovira</td>
+				<td style="border: 1px solid black">C Dante Alighieri 81</td>
+				<td style="border: 1px solid black"><p>El túnel passa per sota dels barris de Can Baró, del Carmel i de la Font d’en Fargues. L’entrada sud se situa al barri del Baix Guinardó, i la nord, al Carmel. Consta de tres galeries —només dues d’operatives—, cadascuna amb dos carrils de circulació unidireccional i una longitud de 1.300 metres. Només s’hi permet el trànsit rodat, i està prohibit el pas de vianants i vehicles no motoritzats.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">La carretera de les Aigües (sector Horta-Guinardó)</td>
+				<td style="border: 1px solid black">Ctra Aigües 361</td>
+				<td style="border: 1px solid black"><p>La carretera de les Aigües és un camí situat a la serra de Collserola, i discorre pel vessant que mira a la ciutat. És un dels espais verds més visitats pels barcelonins —amb uns 2.000 usuaris diaris— gràcies a la proximitat a la urbs i la bona comunicació. Té l’origen en l’antic recorregut d’una conducció de distribució d’aigua, fet que n’explica el traçat horitzontal i el nom.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">El barri de la Clota</td>
+				<td style="border: 1px solid black">C Capcir 2</td>
+				<td style="border: 1px solid black"><p>Situat entre el carrer de Lisboa, l’avinguda del Cardenal Vidal i Barraquer i l’avinguda de l’Estatut de Catalunya, el barri de la Clota és un dels nuclis de població més vells del districte. Un antic mas del segle XIII, avui desaparegut, és l’origen d’aquest lloc popular de casetes baixes, tallers i horts.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">El pont de Mühlberg</td>
+				<td style="border: 1px solid black">C Mühlberg 100</td>
+				<td style="border: 1px solid black"><p>Amb prop de 70 metres de llargada, el pont de Mühl-berg es va instal·lar per salvar el buit que hi ha a la paret del turó de la Rovira, conseqüència d’anys d’explotació de les seves pedreres: des de mitjan segle XIX, el material calcari d’aquesta àrea s’ha extret per fabricar calç i pedra per a la construcció, fet que ha deixat grans esvorancs a la muntanya.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">El carrer de Campoamor</td>
+				<td style="border: 1px solid black">C Campoamor 4</td>
+				<td style="border: 1px solid black"><p>Va ser a partir del 1870 que les famílies benestants de Barcelona van fixar les seves residències d’estiu a l’antiga rambla de Cortada, on es van fer aixecar opulentes torres. L’any 1907 la rambla va passar a dir-se carrer de Campoamor i, durant bona part del segle XX, aquest va ser el carrer més distingit d’Horta.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Centre Educatiu CETT</td>
+				<td style="border: 1px solid black">Av Can Marcet 36</td>
+				<td style="border: 1px solid black"><p>El CETT és un centre internacional de formació en turisme, hoteleria i gastronomia que ofereix tots els nivells de formació: des dels cicles formatius fins a la formació de grau i postgrau. </p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Restaurant Can Travi Nou</td>
+				<td style="border: 1px solid black">Camí Sant Cebrià 1</td>
+				<td style="border: 1px solid black"><p>És possible, encara, visitar l’interior d’una típica masia catalana en plena ciutat de Barcelona: el restaurant Can Travi Nou conserva l’estructura original de l’edifici i permet veure’n les estances i altres elements originals, com ara el pou o el celler. L’antiga masia era propietat de la família Samsó, dedicada durant generacions al cultiu de la vinya i a la cria de bestiar.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Edifici Patronat Ribas</td>
+				<td style="border: 1px solid black">Pg Vall d'Hebron 93</td>
+				<td style="border: 1px solid black"><p>L’edifici, inaugurat com a orfenat l’any 1930, és actualment l’institut d’ensenyament secundari Vall d’Hebron. Fins als anys setanta va ser seu de l’Orfenat Ribas, gràcies al llegat de l’empresari del tèxtil Lluís Ribas, que va deixar l’herència per a obres de beneficència destinades als fills dels seus obrers. </p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Torre Jussana - Centre de Serveis a les Associacions</td>
+				<td style="border: 1px solid black">Av Cardenal Vidal Barraquer 30</td>
+				<td style="border: 1px solid black"><p>Construïda sobre les restes d’una antiga masia, la Torre Jussana és, des de l’any 1995, la seu del Centre de Serveis a les Associacions, un organisme municipal que ofereix recursos i serveis a totes les entitats socials que treballen al servei de la ciutadania. L’edifici és un exemple paradigmàtic de residència neoclàssica d’inspiració francesa.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Parc de les Aigües</td>
+				<td style="border: 1px solid black">Pl Alfons el Savi 3</td>
+				<td style="border: 1px solid black"><p>El parc es troba edificat sobre terrenys de l’antiga Companyia d’Aigües de Barcelona. Forma una illa muntanyosa amb nombroses terrasses independents separades per murs de pedra i camins. La majoria de terrasses són zones per al descans, però també hi ha tres àrees de jocs infantils, una pista poliesportiva, una altra de petanca, espais per a gossos, una font i una zona de pícnic a l’ombra. </p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Parc del Guinardó</td>
+				<td style="border: 1px solid black">Garriga i Roca 1</td>
+				<td style="border: 1px solid black"><p>Al barri del Guinardó, a la coneguda plaça del Nen de la Rutlla, s’obre el parc del Guinardó, un univers natural que permet passar en pocs minuts del context urbà a un bosc frondós. Els jardins històrics, travessats per un torrent canalitzat amb estanys i salts d’aigua, s’organitzen en terrasses que conviden a passejar i gaudir de la vegetació forestal.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Parc del Laberint d'Horta</td>
+				<td style="border: 1px solid black">Pg Castanyers 1</td>
+				<td style="border: 1px solid black"><p>Espai per perdre’s i trobar-se, el Laberint d’Horta és un llegat natural i artístic únic a Barcelona que els habitants del districte d’Horta-Guinardó conserven amb molt d’orgull. El parc del Laberint d’Horta guarda molts racons per descobrir en el seu extens espai natural, i el seu famós laberint n’és l’element més destacat.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Hort Urbà Masia Can Soler</td>
+				<td style="border: 1px solid black">Ctra Sant Cugat 114</td>
+				<td style="border: 1px solid black"><p>Coneguda també com a Cal Boig i Font del Bacallà, aquesta masia de principis del segle XIX conserva la teulada àrab i els esgrafiats de la façana. Es troba en una finca de 32.000 metres quadrats, just a l’entrada del parc de Collserola, i fins a principis del segle XXI se’n cuidaven uns masovers. </p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Barcelona Activa</td>
+				<td style="border: 1px solid black">Ptge Andalet 11</td>
+				<td style="border: 1px solid black"><p>Ca n’Andalet rep el nom de qui en va ser masover, Eudald Bernet, més conegut com l’Andalet. Abans, però, el mas se’l coneixia com a Can Ventura, Mariner del Coll i Can Grasses. Fins als anys cinquanta als terrenys de la masia s’hi conreaven hortalisses i plantes de jardí que es venien al Mercat d’Horta. Avui és una de les dependències de Barcelona Activa. </p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Turó Park - Parc del Poeta Eduard Marquina</td>
+				<td style="border: 1px solid black">Av Pau Casals 19</td>
+				<td style="border: 1px solid black"><p>Amb petites zones boscoses, parterres florits, un estany, places de regust romàntic i nombrosos arbres, el Turó Park és un refugi bucòlic on es pot gaudir de la natura en plena ciutat. Obert a l’avinguda de Pau Casals, està dedicat al poeta Eduard Marquina i mostra diverses peces d’art que conviden a deixar volar somnis i fantasies.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Centre de Reunions i Convencions UAB Casa Convalescència</td>
+				<td style="border: 1px solid black">C Sant Antoni Maria Claret 171</td>
+				<td style="border: 1px solid black"><p>Imponent i alhora acollidora, la Casa Convalescència va ser dissenyada a finals del segle XIX per l’arquitecte Pere Domènech i Roura en el més pur estil modernista català, cosa que li ha valgut el reconeixement de la Unesco com a Patrimoni Cultural de la Humanitat. En l’actualitat funciona com a centre d’estudis de la Universitat Autònoma de Barcelona i com a seu de la Fundació UAB.</p></td>
+			</tr>
+			<tr>
+				<td style="border: 1px solid black">Velodrom Municipal d'Horta Miquel Poblet</td>
+				<td style="border: 1px solid black">Pg Vall d'Hebron 185</td>
+				<td style="border: 1px solid black"><p>El velòdrom també té gimnàs, dos camps de futbol de gespa artificial, un pavelló de bàsquet i tres sales polivalents per a la pràctica de diferents esports. Té una corda o track homologada de 250 metres, revestida de fusta, i 50 bicicletes de pinyó fix per a la pràctica del ciclisme. Ofereix medicina i podologia esportives, massatges, restauració i servei d’àpats.</p></td>
+			</tr>
+		</table>
+	</body>
+</html>

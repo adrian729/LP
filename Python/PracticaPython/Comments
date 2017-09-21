@@ -1,0 +1,20 @@
+Parametres:
+
+    --lan seguit de 'cat', 'es', 'en' o 'fr' -> indica l'arxiu
+    (idioma), si no es possa sera 'cat'.
+
+    --key seguit de la consulta.
+
+    Consulta:
+        - conjuncions: representades amb tuples.
+        - disjuncions: representades amb llistes.
+        * si estan asociades a camps d'informacio usarem
+          diccionaris.
+        - strings
+    Camps: name, content, location (inclou tags address, district i
+    barri).
+
+    * Consulta sense distincions entre mayus minus ni accents.
+    * Si nomes hi ha un element no calen llistes ni tuples.
+    * Si no s'indica cap camp es mirara nomes name i location
+      (amb els tres tags indicats anteriorment).
